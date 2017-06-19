@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ruleset name="My coding standard">
+    <description>My coding standard</description>
+
+    <!-- display progress -->
+    <arg value="p"/>
+    <!-- use colors in output -->
+    <arg name="colors"/>
+
+    <!-- Inherit rules from: PSR2-->
+    <rule ref="PSR2"/>
+
+    <!-- Disallow use long array syntax -->
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
+
+    <!-- Required fix all TODO and FIXME markers -->
+    <!--<rule ref="Generic.Commenting.Fixme" />-->
+    <!--<rule ref="Generic.Commenting.Todo" />-->
+
+    <!-- Disallow use deprecated functions -->
+    <rule ref="Generic.PHP.DeprecatedFunctions"/>
+
+    <!-- MUST comment if method or function has exception -->
+    <rule ref="Squiz.Commenting.FunctionCommentThrowTag"/>
+
+    <!-- Add space to before and after operator -->
+    <rule ref="Squiz.WhiteSpace.OperatorSpacing"/>
+
+    <!-- The closing ?> tag MUST be omitted from files containing only PHP. -->
+    <rule ref="Zend.Files.ClosingTag"/>
+
+    <!-- Exclude some PHP files, it haven't class definitions -->
+    <rule ref="PSR1.Classes.ClassDeclaration">
+        <exclude-pattern>resources/</exclude-pattern>
+        <exclude-pattern>tests/bootstrap.php</exclude-pattern>
+    </rule>
+
+    <!-- Exclude some PHP config files -->
+    <rule ref="PSR1.Files.SideEffects">
+        <exclude-pattern>resources/</exclude-pattern>
+        <exclude-pattern>tests/bootstrap.php</exclude-pattern>
+    </rule>
+
+    <!-- Paths to check -->
+    <file>resources</file>
+    <file>src</file>
+    <file>tests</file>
+
+    <!-- <exclude-pattern>tests/bootstrap.php</exclude-pattern> -->
+</ruleset>

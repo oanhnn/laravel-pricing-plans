@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         bootstrap="tests/bootstrap.php"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnError="false"
+         stopOnFailure="false"
+         syntaxCheck="true"
+         verbose="true"
+>
+    <php>
+        <!-- <ini name="memory_limit" value="-1"/> -->
+        <!-- <env name="APP_ENV" value="testing"/> -->
+    </php>
+
+    <!-- Add any additional test suites you want to run here -->
+    <testsuites>
+        <testsuite name="Test Source">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <!-- Ignore vendor tests in code coverage reports -->
+    <filter>
+        <blacklist>
+            <directory suffix=".php">vendor</directory>
+        </blacklist>
+        <whitelist>
+            <directory suffix=".php">src</directory>
+        </whitelist>
+    </filter>
+</phpunit>
