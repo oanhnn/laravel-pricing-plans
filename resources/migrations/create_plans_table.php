@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Config;
 
 class CreatePlansTable extends Migration
 {
@@ -12,7 +13,9 @@ class CreatePlansTable extends Migration
      */
     public function up()
     {
-        Schema::create('plans', function (Blueprint $table) {
+        $tables = Config::get('plans.tables');
+
+        Schema::create($tables['plans'], function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->text('description')->nullable();
@@ -24,7 +27,7 @@ class CreatePlansTable extends Migration
             $table->timestamps();
         });
 
-        Schema::create('plan_features', function (Blueprint $table) {
+        Schema::create($tables['plan_features'], function (Blueprint $table) {
             $table->increments('id');
             $table->integer('plan_id')->unsigned();
             $table->string('code');
@@ -36,7 +39,7 @@ class CreatePlansTable extends Migration
             $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
         });
 
-        Schema::create('plan_subscriptions', function (Blueprint $table) {
+        Schema::create($tables['plan_subscriptions'], function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned();
             $table->integer('plan_id')->unsigned();
@@ -51,7 +54,7 @@ class CreatePlansTable extends Migration
             $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
         });
 
-        Schema::create('plan_subscription_usages', function (Blueprint $table) {
+        Schema::create($tables['plan_subscription_usages'], function (Blueprint $table) {
             $table->increments('id');
             $table->integer('subscription_id')->unsigned();
             $table->string('code');
@@ -71,9 +74,12 @@ class CreatePlansTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('plan_subscription_usages');
-        Schema::dropIfExists('plan_subscriptions');
-        Schema::dropIfExists('plan_features');
-        Schema::dropIfExists('plans');
+        $tables = Config::get('plans.tables');
+
+        Schema::dropIfExists($tables['plan_subscription_usages']);
+        Schema::dropIfExists($tables['plan_subscriptions']);
+        Schema::dropIfExists($tables['plan_features']);
+        Schema::dropIfExists($tables['plans']);
     }
 }
+
