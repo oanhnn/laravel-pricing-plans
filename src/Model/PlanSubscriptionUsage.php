@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\PricingPlans\Models;
+namespace Laravel\PricingPlans\Model;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
