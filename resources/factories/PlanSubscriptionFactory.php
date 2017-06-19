@@ -1,8 +1,8 @@
 <?php
 
-use Gerardojbaez\LaraPlans\Models\Plan;
-use Gerardojbaez\LaraPlans\Tests\Models\User;
-use Gerardojbaez\LaraPlans\Models\PlanSubscription;
+use Laravel\PricingPlans\Model\Plan;
+use Laravel\PricingPlans\Model\PlanSubscription;
+use Laravel\PricingPlans\Tests\Model\User;
 
 $factory->define(PlanSubscription::class, function (Faker\Generator $faker) {
     return [

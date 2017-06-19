@@ -1,7 +1,7 @@
 <?php
 
-use Gerardojbaez\LaraPlans\Models\PlanSubscription;
-use Gerardojbaez\LaraPlans\Models\PlanSubscriptionUsage;
+use Laravel\PricingPlans\Model\PlanSubscription;
+use Laravel\PricingPlans\Model\PlanSubscriptionUsage;
 
 $factory->define(PlanSubscriptionUsage::class, function (Faker\Generator $faker) {
     return [

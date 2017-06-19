@@ -1,6 +1,6 @@
 <?php
 
-use Gerardojbaez\LaraPlans\Models\Plan;
+use Laravel\PricingPlans\Model\Plan;
 
 $factory->define(Plan::class, function (Faker\Generator $faker) {
     return [

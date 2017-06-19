@@ -1,7 +1,7 @@
 <?php
 
-use Gerardojbaez\LaraPlans\Models\Plan;
-use Gerardojbaez\LaraPlans\Models\PlanFeature;
+use Laravel\PricingPlans\Model\Plan;
+use Laravel\PricingPlans\Model\PlanFeature;
 
 $factory->define(PlanFeature::class, function (Faker\Generator $faker) {
     return [
