@@ -1,7 +1,9 @@
-# Pricing Plans
+# Laravel Pricing Plans
 
 [![Build Status](https://travis-ci.org/oanhnn/laravel-pricing-plans.svg?branch=master)](https://travis-ci.org/oanhnn/laravel-pricing-plans)
 [![Coverage Status](https://coveralls.io/repos/github/oanhnn/laravel-pricing-plans/badge.svg?branch=master)](https://coveralls.io/github/oanhnn/laravel-pricing-plans?branch=master)
+[![Latest Version](https://img.shields.io/github/release/oanhnn/laravel-pricing-plans.svg?style=flat-square)](https://github.com/oanhnn/laravel-pricing-plans/releases)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
 Easy provide pricing plans for Your Laravel 5.4+ Application.
 
@@ -13,8 +15,9 @@ Easy provide pricing plans for Your Laravel 5.4+ Application.
     - [Composer](#composer)
     - [Service Provider](#service-provider)
     - [Config file and Migrations](#config-file-and-migrations)
-    - [Traits and Contracts](#traits-and-contracts)
+    - [Subscriber Trait](#subscriber-trait)
 - [Usage](#usage)
+    - [Create a Feature](#create-a-feature)
     - [Create a Plan](#create-a-plan)
     - [Creating subscriptions](#creating-subscriptions)
     - [Subscription Ability](#subscription-ability)
@@ -26,9 +29,21 @@ Easy provide pricing plans for Your Laravel 5.4+ Application.
     - [Cancel a Subscription](#cancel-a-subscription)
     - [Scopes](#scopes)
 - [Models](#models)
+    - [Feature model](#feature-model) 
+    - [Plan model](#plan-model) 
+    - [PlanFeature model](#planfeature-model) 
+    - [PlanSubscription model](#plansubscription-model) 
+    - [PlanSubscriptionUsage model](#plansubscriptionusage-model) 
+- [Events](#events)
+    - [SubscriptionRenewed event](#subscriptionrenewed-event)
+    - [SubscriptionCanceled event](#subscriptioncanceled-event)
+    - [SubscriptionPlanChanged event](#subscriptionplanchanged-event)
 - [Config File](#config-file)
 - [Changelog](#changelog)
+- [Testing](#testing)
 - [Contributing](#contributing)
+- [Security](#security)
+- [Credits](#credits)
 - [License](#license)
 
 <!-- /MarkdownTOC -->
@@ -54,7 +69,7 @@ $ composer require oanhnn/laravel-pricing-plans
 
 ### Service Provider
 
-Next, if using Laravel 5.4+, include the service provider within your `config/app.php` file.
+Next, if using Laravel 5.5+, you done. If using Laravel 5.4, you must include the service provider within your `config/app.php` file.
 
 ```php
 // config/app.php
@@ -80,9 +95,9 @@ Then run migrations:
     php artisan migrate
 ```
 
-### Traits and Contracts
+### Subscriber Trait
 
-Add `Laravel\PricingPlans\Traits\PlanSubscriber` trait and `Laravel\PricingPlans\Contracts\PlanSubscriberInterface` contract to your `User` model.
+Add `Laravel\PricingPlans\Models\Concerns\Subscribable` trait to your subscriber model (Eg. `User`).
 
 See the following example:
 
@@ -92,35 +107,60 @@ See the following example:
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Laravel\PricingPlans\Contracts\PlanSubscriberInterface;
-use Laravel\PricingPlans\Traits\PlanSubscriber;
+use Laravel\PricingPlans\Contracts\Subscriber;
+use Laravel\PricingPlans\Models\Concerns\Subscribable;
 
-class User extends Authenticatable implements PlanSubscriberInterface
+class User extends Authenticatable implements Subscriber
 {
-    use PlanSubscriber;
+    use Subscribable;
+    // ...
+}
 ```
 
 ## Usage
+
+### Create a feature
 
 ### Create a Plan
 
 ```php
 <?php
 
-use Laravel\PricingPlans\Model\Plan;
-use Laravel\PricingPlans\Model\PlanFeature;
+use Laravel\PricingPlans\Models\Feature;
+use Laravel\PricingPlans\Models\Plan;
+
+$feature1 = Feature::create([
+    'name' => 'upload images',
+    'description' => null,
+    'interval_unit' => 'day',
+    'interval_count' => 1,
+    'sort_order' => 1,
+]);
+
+$feature2 = Feature::create([
+    'name' => 'upload video',
+    'description' => null,
+    'interval_unit' => 'day',
+    'interval_count' => 1,
+    'sort_order' => 1,
+]);
 
 $plan = Plan::create([
     'name' => 'Pro',
     'description' => 'Pro plan',
     'price' => 9.99,
-    'interval' => 'month',
+    'interval_unit' => 'month',
     'interval_count' => 1,
-    'trial_period_days' => 15,
+    'trial_period_days' => 5,
     'sort_order' => 1,
 ]);
 
-$plan->features()->saveMany([
+$plan->features()->attach([
+    $feature1->id => ['value' => 5, 'note' => 'Can upload maximum 5 images daily'],
+    $feature2->id => ['value' => 1, 'note' => 'Can upload maximum 1 video daily'],
+]);
+
+$plan->features()->save([
     new PlanFeature(['code' => 'listings', 'value' => 50, 'sort_order' => 1]),
     new PlanFeature(['code' => 'pictures_per_listing', 'value' => 10, 'sort_order' => 5]),
     new PlanFeature(['code' => 'listing_duration_days', 'value' => 30, 'sort_order' => 10]),
@@ -138,7 +178,10 @@ $amountOfPictures = $plan->getFeatureByCode('pictures_per_listing')->value
 
 ### Creating subscriptions
 
-You can subscribe a user to a plan by using the `newSubscription()` function available in the `PlanSubscriber` trait. First, retrieve an instance of your subscriber model, which typically will be your user model and an instance of the plan your user is subscribing to. Once you have retrieved the model instance, you may use the `newSubscription` method to create the model's subscription.
+You can subscribe a user to a plan by using the `newSubscription()` function available in the `PlanSubscriber` trait. 
+First, retrieve an instance of your subscriber model, which typically will be your user model and an instance of the plan
+your user is subscribing to. Once you have retrieved the model instance, you may use the `newSubscription` method 
+to create the model's subscription.
 
 ```php
 <?php
@@ -152,9 +195,12 @@ $plan = Plan::find(1);
 $user->newSubscription('main', $plan)->create();
 ```
 
-The first argument passed to `newSubscription` method should be the name of the subscription. If your application offer a single subscription, you might call this `main` or `primary`. The second argument is the plan instance your user is subscribing to.
+The first argument passed to `newSubscription` method should be the name of the subscription. If your application offer 
+a single subscription, you might call this `main` or `primary`. The second argument is the plan instance your user is subscribing to.
 
-<!-- ~~If both plans (current and new plan) have the same billing frequency (e.g., ` interval` and `interval_count`) the subscription will retain the same billing dates. If the plans don't have the same billing frequency, the subscription will have the new plan billing frequency, starting on the day of the change and _the subscription usage data will be cleared_.~~ -->
+<!-- ~~If both plans (current and new plan) have the same billing frequency (e.g., ` interval` and `interval_count`) the subscription 
+will retain the same billing dates. If the plans don't have the same billing frequency, the subscription will have the new plan billing frequency, 
+starting on the day of the change and _the subscription usage data will be cleared_.~~ -->
 
 <!-- ~~If the new plan have a trial period and it's a new subscription, the trial period will be applied.~~ -->
 
@@ -184,12 +230,14 @@ Other methods are:
 
 ### Record Feature Usage
 
-In order to efectively use the ability methods you will need to keep track of every usage of each feature (or at least those that require it). You may use the `record` method available through the user `subscriptionUsage()` method:
+In order to efectively use the ability methods you will need to keep track of every usage of each feature (or at least those that require it). 
+You may use the `record` method available through the user `subscriptionUsage()` method:
 
 ```php
 $user->subscriptionUsage('main')->record('listings');
 ```
-The `record` method accept 3 parameters: the first one is the feature's code, the second one is the quantity of uses to add (default is `1`), and the third one indicates if the addition should be incremental (default behavior), when disabled the usage will be override by the quantity provided.
+The `record` method accept 3 parameters: the first one is the feature's code, the second one is the quantity of uses to add (default is `1`), 
+and the third one indicates if the addition should be incremental (default behavior), when disabled the usage will be override by the quantity provided.
 
 E.g.:
 
@@ -240,7 +288,8 @@ $user->subscription('main')->onTrial();
 
 ### Renew a Subscription
 
-To renew a subscription you may use the `renew` method available in the subscription model. This will set a new `ends_at` date based on the selected plan and _will clear the usage data_ of the subscription.
+To renew a subscription you may use the `renew` method available in the subscription model. This will set a new `ends_at` date 
+based on the selected plan and _will clear the usage data_ of the subscription.
 
 ```php
 $user->subscription('main')->renew();
@@ -300,7 +349,7 @@ Laravel\PricingPlans\Model\PlanSubscription;
 Laravel\PricingPlans\Model\PlanSubscriptionUsage;
 ```
 
-For more details take a look to each model and the `Laravel\PricingPlans\Traits\PlanSubscriber` trait.
+For more details take a look to each model and the `Laravel\PricingPlans\Models\Concerns\PlanSubscriber` trait.
 
 ## Config File
 
@@ -310,7 +359,6 @@ Definitions:
 
 - **Positive Words**: Are used to tell if a particular feature is _enabled_. E.g., if the feature `listing_title_bold` 
    has the value `Y` (_Y_ is one of the positive words) then, that means it's enabled.
-- **Features**: List of features that your app and plans will use.
 
 Take a look to the `config/plans.php` config file for more details.
 
@@ -318,21 +366,33 @@ Take a look to the `config/plans.php` config file for more details.
 
 See all change logs in [CHANGELOG.md][changelog]
 
+## Testing
+
+```bash
+$ git clone git@github.com/oanhnn/laravel-pricing-plans.git /path
+$ cd /path
+$ composer install
+$ composer phpunit
+```
+
 ## Contributing
 
-All code contributions must go through a pull request and approved by
-a core developer before being merged. This is to ensure proper review of all the code.
+Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-Fork the project, create a feature branch, and send a pull request.
+## Security
 
-To ensure a consistent code base, you should make sure the code follows the [PSR-2][psr2].
+If you discover any security related issues, please email to [Oanh Nguyen](mailto:oanhnn.bk@gmail.com) instead of 
+using the issue tracker.
 
-If you would like to help take a look at the [list of issues][issues].
+## Credits
+
+- [Oanh Nguyen](https://github.com/oanhnn)
+- [All Contributors](../../contributors)
 
 ## License
 
 This project is released under the MIT License.   
-Copyright © 2017 [Oanh Nguyen](https://oanhnn.github.io/).
+Copyright © 2017-2018 [Oanh Nguyen](https://oanhnn.github.io/).
 
 
 [changelog]: https://github.com/oanhnn/laravel-pricing-plans/blob/master/CHANGELOG.md

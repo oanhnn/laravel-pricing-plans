@@ -4,7 +4,7 @@ namespace Laravel\PricingPlans;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Lang;
-use Laravel\PricingPlans\Exception\InvalidIntervalException;
+use InvalidArgumentException;
 
 class Period
 {
@@ -31,60 +31,121 @@ class Period
     /**
      * Starting date of the period.
      *
-     * @var string
+     * @var \Carbon\Carbon
      */
-    protected $start;
+    protected $startAt;
 
     /**
      * Ending date of the period.
      *
-     * @var string
+     * @var \Carbon\Carbon
      */
-    protected $end;
+    protected $endAt;
 
     /**
      * Interval
      *
      * @var string
      */
-    protected $interval;
+    protected $intervalUnit;
 
     /**
      * Interval count
      *
      * @var int
      */
-    protected $interval_count = 1;
+    protected $intervalCount = 1;
 
     /**
      * Create a new Period instance.
      *
-     * @param  string $interval Interval
-     * @param  int $count Interval count
-     * @param  string $start Starting point
-     * @throws  InvalidIntervalException
+     * @param string $intervalUnit Interval Unit
+     * @param int $intervalCount Interval count
+     * @param mixed $startAt Starting point
+     * @throws InvalidArgumentException
      */
-    public function __construct($interval = 'month', $count = 1, $start = '')
+    public function __construct($intervalUnit = 'month', $intervalCount = 1, $startAt = '')
     {
-        if (empty($start)) {
-            $this->start = new Carbon();
-        } elseif (!$start instanceof Carbon) {
-            $this->start = new Carbon($start);
+        if (empty($startAt)) {
+            $this->startAt = new Carbon();
+        } elseif (!$startAt instanceof Carbon) {
+            $this->startAt = Carbon::parse($startAt);
         } else {
-            $this->start = $start;
+            $this->startAt = $startAt;
         }
 
-        if (!$this::isValidInterval($interval)) {
-            throw new InvalidIntervalException($interval);
+        if (!self::isValidIntervalUnit($intervalUnit)) {
+            throw new InvalidArgumentException("Interval unit `{$intervalUnit}` is invalid");
         }
 
-        $this->interval = $interval;
+        $this->intervalUnit = $intervalUnit;
 
-        if ($count > 0) {
-            $this->interval_count = $count;
+        if ($intervalCount >= 0) {
+            $this->intervalCount = $intervalCount;
         }
 
         $this->calculate();
+    }
+
+    /**
+     * Get start date.
+     *
+     * @return \Carbon\Carbon
+     */
+    public function getStartAt()
+    {
+        return $this->startAt;
+    }
+
+    /**
+     * Get end date.
+     *
+     * @return \Carbon\Carbon
+     */
+    public function getEndAt()
+    {
+        return $this->endAt;
+    }
+
+    /**
+     * Get period interval.
+     *
+     * @return string
+     */
+    public function getIntervalUnit()
+    {
+        return $this->intervalUnit;
+    }
+
+    /**
+     * Get period interval count.
+     *
+     * @return int
+     */
+    public function getIntervalCount()
+    {
+        return $this->intervalCount;
+    }
+
+    /**
+     * Calculate the end date of the period.
+     *
+     * @return void
+     */
+    protected function calculate()
+    {
+        $method = $this->getMethod();
+        $this->endAt = clone($this->startAt)->$method($this->intervalCount);
+    }
+
+    /**
+     * Get computation method.
+     *
+     * @return string
+     */
+    protected function getMethod()
+    {
+        return self::$intervalMapping[$this->intervalUnit];
     }
 
     /**
@@ -97,82 +158,20 @@ class Period
         $intervals = [];
 
         foreach (array_keys(self::$intervalMapping) as $interval) {
-            $intervals[$interval] = Lang::trans('plans::messages.'.$interval);
+            $intervals[$interval] = Lang::trans('plans::messages.' . $interval);
         }
 
         return $intervals;
     }
 
     /**
-     * Get start date.
-     *
-     * @return string
-     */
-    public function getStartDate()
-    {
-        return $this->start;
-    }
-
-    /**
-     * Get end date.
-     *
-     * @return string
-     */
-    public function getEndDate()
-    {
-        return $this->end;
-    }
-
-    /**
-     * Get period interval.
-     *
-     * @return string
-     */
-    public function getInterval()
-    {
-        return $this->interval;
-    }
-
-    /**
-     * Get period interval count.
-     *
-     * @return int
-     */
-    public function getIntervalCount()
-    {
-        return $this->interval_count;
-    }
-
-    /**
      * Check if a given interval is valid.
      *
-     * @param  string $interval
-     * @return boolean
+     * @param  string $intervalUnit
+     * @return bool
      */
-    public static function isValidInterval($interval)
+    public static function isValidIntervalUnit($intervalUnit): bool
     {
-        return array_key_exists($interval, self::$intervalMapping);
-    }
-
-    /**
-     * Calculate the end date of the period.
-     *
-     * @return void
-     */
-    protected function calculate()
-    {
-        $method = $this->getMethod();
-        $start = clone($this->start);
-        $this->end = $start->$method($this->interval_count);
-    }
-
-    /**
-     * Get computation method.
-     *
-     * @return string
-     */
-    protected function getMethod()
-    {
-        return self::$intervalMapping[$this->interval];
+        return array_key_exists($intervalUnit, self::$intervalMapping);
     }
 }

@@ -1,13 +1,23 @@
 <?php
 
-namespace Laravel\PricingPlans\Model;
+namespace Laravel\PricingPlans\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
-use Laravel\PricingPlans\Contracts\PlanSubscriptionUsageInterface;
 
-class PlanSubscriptionUsage extends Model implements PlanSubscriptionUsageInterface
+/**
+ * Class PlanSubscriptionUsage
+ * @package Laravel\PricingPlans\Models
+ * @property int $id
+ * @property int $subscription_id
+ * @property int $feature_id
+ * @property int $used
+ * @property \Carbon\Carbon $valid_until
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ */
+class PlanSubscriptionUsage extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -15,8 +25,6 @@ class PlanSubscriptionUsage extends Model implements PlanSubscriptionUsageInterf
      * @var array
      */
     protected $fillable = [
-        'subscription_id',
-        'code',
         'valid_until',
         'used'
     ];
@@ -27,7 +35,9 @@ class PlanSubscriptionUsage extends Model implements PlanSubscriptionUsageInterf
      * @var array
      */
     protected $dates = [
-        'created_at', 'updated_at', 'valid_until',
+        'created_at',
+        'updated_at',
+        'valid_until',
     ];
 
     /**
@@ -49,7 +59,11 @@ class PlanSubscriptionUsage extends Model implements PlanSubscriptionUsageInterf
      */
     public function feature()
     {
-        return $this->belongsTo(Config::get('plans.models.plan_feature'));
+        return $this->belongsTo(
+            Config::get('plans.models.Feature'),
+            'feature_id',
+            'id'
+        );
     }
 
     /**
@@ -59,19 +73,23 @@ class PlanSubscriptionUsage extends Model implements PlanSubscriptionUsageInterf
      */
     public function subscription()
     {
-        return $this->belongsTo(Config::get('plans.models.plan_subscription'));
+        return $this->belongsTo(
+            Config::get('plans.models.PlanSubscription'),
+            'subscription_id',
+            'id'
+        );
     }
 
     /**
      * Scope by feature code.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $featureCode
+     * @param int|Feature $feature
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeByFeatureCode($query, $featureCode)
+    public function scopeByFeature($query, $feature)
     {
-        return $query->where('code', $featureCode);
+        return $query->where('feature_id', $feature instanceof Feature ? $feature->id : $feature);
     }
 
     /**
@@ -85,6 +103,6 @@ class PlanSubscriptionUsage extends Model implements PlanSubscriptionUsageInterf
             return false;
         }
 
-        return Carbon::now()->gt($this->valid_until) or Carbon::now()->eq($this->valid_until);
+        return Carbon::now()->gte($this->valid_until);
     }
 }

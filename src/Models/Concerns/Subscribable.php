@@ -1,41 +1,43 @@
 <?php
 
-namespace Laravel\PricingPlans\Traits;
+namespace Laravel\PricingPlans\Models\Concerns;
 
 use Illuminate\Support\Facades\Config;
+use Laravel\PricingPlans\Models\Plan;
+use Laravel\PricingPlans\Models\PlanSubscription;
 use Laravel\PricingPlans\SubscriptionBuilder;
 use Laravel\PricingPlans\SubscriptionUsageManager;
-use Laravel\PricingPlans\Contracts\PlanSubscriptionInterface;
 
-trait PlanSubscriber
+trait Subscribable
 {
     /**
      * Get a subscription by name.
      *
      * @param  string $name
-     * @return PlanSubscriptionInterface|null
+     * @return PlanSubscription|null
      */
     public function subscription($name = 'default')
     {
-        $subscriptions = $this->subscriptions->sortByDesc(function ($value) {
-            return $value->created_at->getTimestamp();
-        });
-
-        foreach ($subscriptions as $key => $subscription) {
-            if ($subscription->name === $name) {
-                return $subscription;
-            }
-        }
+        return $this->subscriptions
+            ->sortByDesc(function ($value) {
+                return $value->created_at->getTimestamp();
+            })
+            ->first(function ($subscription) use ($name) {
+                return $subscription->name === $name;
+            });
     }
 
     /**
      * Get user plan subscription.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     public function subscriptions()
     {
-        return $this->hasMany(Config::get('plans.models.plan_subscription'));
+        return $this->morphMany(
+            Config::get('plans.models.PlanSubscription'),
+            'subscriber'
+        );
     }
 
     /**
@@ -45,7 +47,7 @@ trait PlanSubscriber
      * @param  int $planId
      * @return bool
      */
-    public function subscribed($subscription = 'default', $planId = null)
+    public function subscribed($subscription = 'default', $planId = null): bool
     {
         $subscription = $this->subscription($subscription);
 
@@ -53,12 +55,8 @@ trait PlanSubscriber
             return false;
         }
 
-        if (is_null($planId)) {
-            return $subscription->active();
-        }
-
-        if ($planId == $subscription->plan_id and $subscription->active()) {
-            return true;
+        if (is_null($planId) || $planId == $subscription->plan_id) {
+            return $subscription->isActive();
         }
 
         return false;
@@ -68,10 +66,10 @@ trait PlanSubscriber
      * Subscribe user to a new plan.
      *
      * @param string $subscription
-     * @param mixed $plan
+     * @param \Laravel\PricingPlans\Models\Plan $plan
      * @return \Laravel\PricingPlans\SubscriptionBuilder
      */
-    public function newSubscription($subscription, $plan)
+    public function newSubscription(string $subscription, Plan $plan)
     {
         return new SubscriptionBuilder($this, $subscription, $plan);
     }

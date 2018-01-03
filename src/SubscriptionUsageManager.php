@@ -2,6 +2,9 @@
 
 namespace Laravel\PricingPlans;
 
+use Laravel\PricingPlans\Models\Feature;
+use Laravel\PricingPlans\Models\PlanSubscription;
+
 class SubscriptionUsageManager
 {
     /**
@@ -14,9 +17,9 @@ class SubscriptionUsageManager
     /**
      * Create new Subscription Usage Manager instance.
      *
-     * @param \Illuminate\Database\Eloquent\Model $subscription
+     * @param \Laravel\PricingPlans\Models\PlanSubscription $subscription
      */
-    public function __construct($subscription)
+    public function __construct(PlanSubscription $subscription)
     {
         $this->subscription = $subscription;
     }
@@ -26,36 +29,36 @@ class SubscriptionUsageManager
      *
      * This will create or update a usage record.
      *
-     * @param string $feature
+     * @param int $featureId
      * @param int $uses
      * @param bool $incremental
-     * @return \Laravel\PricingPlans\Contracts\PlanSubscriptionUsageInterface
+     * @return \Laravel\PricingPlans\Models\PlanSubscriptionUsage
      */
-    public function record($feature, $uses = 1, $incremental = true)
+    public function record($featureId, $uses = 1, $incremental = true)
     {
-        $feature = new Feature($feature);
+        /** @var \Laravel\PricingPlans\Models\Feature $feature */
+        $feature = Feature::findOrFail($featureId);
 
         $usage = $this->subscription->usage()->firstOrNew([
-            'code' => $feature->getFeatureCode(),
+            'feature_id' => $feature->id,
         ]);
 
-        if ($feature->isReseteable()) {
-        // Set expiration date when the usage record is new
-            // or doesn't have one.
+        if ($feature->isResettable()) {
+            // Set expiration date when the usage record is new or doesn't have one.
             if (is_null($usage->valid_until)) {
-            // Set date from subscription creation date so
-                // the reset period match the period specified
+                // Set date from subscription creation date so the reset period match the period specified
                 // by the subscription's plan.
-                $usage->valid_until = $feature->getResetDate($this->subscription->created_at);
-            } // If the usage record has been expired, let's assign
-            // a new expiration date and reset the uses to zero.
-            elseif ($usage->isExpired() === true) {
-                $usage->valid_until = $feature->getResetDate($usage->valid_until);
+                $usage->valid_until = $feature->getResetTime($this->subscription->created_at);
+                // TODO:
+            } elseif ($usage->isExpired() === true) {
+                // If the usage record has been expired, let's assign
+                // a new expiration date and reset the uses to zero.
+                $usage->valid_until = $feature->getResetTime($usage->valid_until);
                 $usage->used = 0;
             }
         }
 
-        $usage->used = ($incremental ? $usage->used + $uses : $uses);
+        $usage->used = max($incremental ? $usage->used + $uses : $uses, 0);
 
         $usage->save();
 
@@ -65,28 +68,13 @@ class SubscriptionUsageManager
     /**
      * Reduce usage.
      *
-     * @param string $feature
+     * @param int $featureId
      * @param int $uses
-     * @return \Laravel\PricingPlans\Contracts\PlanSubscriptionUsageInterface
+     * @return \Laravel\PricingPlans\Models\PlanSubscriptionUsage
      */
-    public function reduce($feature, $uses = 1)
+    public function reduce($featureId, $uses = 1)
     {
-        $feature = new Feature($feature);
-
-        $usage = $this->subscription
-            ->usage()
-            ->byFeatureCode($feature->getFeatureCode())
-            ->first();
-
-        if (is_null($usage)) {
-            return false;
-        }
-
-        $usage->used = max($usage->used - $uses, 0);
-
-        $usage->save();
-
-        return $usage;
+        return $this->record($featureId, -$uses);
     }
 
     /**

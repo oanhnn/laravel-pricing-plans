@@ -1,10 +1,10 @@
 <?php
 
-namespace Laravel\PricingPlans\Traits;
+namespace Laravel\PricingPlans\Models\Concerns;
 
 use Illuminate\Support\Facades\Config;
 
-trait BelongsToPlan
+trait BelongsToPlanModel
 {
     /**
      * Get plan.
@@ -13,7 +13,12 @@ trait BelongsToPlan
      */
     public function plan()
     {
-        return $this->belongsTo(Config::get('plans.models.Plan'));
+        return $this->belongsTo(
+            Config::get('plans.models.Plan'),
+            Config::get('plans.tables.plans'),
+            'plan_id',
+            'id'
+        );
     }
 
     /**

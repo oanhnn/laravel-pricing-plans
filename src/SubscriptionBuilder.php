@@ -4,20 +4,21 @@ namespace Laravel\PricingPlans;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\PricingPlans\Models\Plan;
 
 class SubscriptionBuilder
 {
     /**
-     * The user model that is subscribing.
+     * The subscriber model that is subscribing.
      *
      * @var \Illuminate\Database\Eloquent\Model
      */
-    protected $user;
+    protected $subscriber;
 
     /**
-     * The plan model that the user is subscribing to.
+     * The plan model that the subscriber is subscribing to.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var \Laravel\PricingPlans\Models\Plan
      */
     protected $plan;
 
@@ -47,13 +48,13 @@ class SubscriptionBuilder
     /**
      * Create a new subscription builder instance.
      *
-     * @param  mixed  $user
-     * @param  string  $name  Subscription name
+     * @param  mixed  $subscriber
+     * @param  string $name  Subscription name
      * @param  mixed  $plan
      */
-    public function __construct(Model $user, string $name, Model $plan)
+    public function __construct(Model $subscriber, string $name, Plan $plan)
     {
-        $this->user = $user;
+        $this->subscriber = $subscriber;
         $this->name = $name;
         $this->plan = $plan;
     }
@@ -64,7 +65,7 @@ class SubscriptionBuilder
      * @param  int $trialDays
      * @return self
      */
-    public function trialDays($trialDays)
+    public function trialDays(int $trialDays)
     {
         $this->trialDays = $trialDays;
 
@@ -87,7 +88,7 @@ class SubscriptionBuilder
      * Create a new subscription.
      *
      * @param  array  $attributes
-     * @return \Laravel\PricingPlans\Contracts\PlanSubscriptionInterface
+     * @return \Laravel\PricingPlans\Models\PlanSubscription
      */
     public function create(array $attributes = [])
     {
@@ -96,14 +97,14 @@ class SubscriptionBuilder
         if ($this->skipTrial) {
             $trialEndsAt = null;
         } elseif ($this->trialDays) {
-            $trialEndsAt = ($this->trialDays ? $now->addDays($this->trialDays) : null);
+            $trialEndsAt = $now->addDays($this->trialDays);
         } elseif ($this->plan->hasTrial()) {
             $trialEndsAt = $now->addDays($this->plan->trial_period_days);
         } else {
             $trialEndsAt = null;
         }
 
-        return $this->user->subscriptions()->create(array_replace([
+        return $this->subscriber->subscriptions()->create(array_replace([
             'plan_id' => $this->plan->id,
             'trial_ends_at' => $trialEndsAt,
             'name' => $this->name

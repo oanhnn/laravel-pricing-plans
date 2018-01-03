@@ -1,12 +1,14 @@
 <?php
 
-use Laravel\PricingPlans\Model\Plan;
-use Laravel\PricingPlans\Model\PlanFeature;
+use Faker\Generator;
+use Laravel\PricingPlans\Models\Feature;
+use Laravel\PricingPlans\Models\Plan;
+use Laravel\PricingPlans\Models\PlanFeature;
 
-$factory->define(PlanFeature::class, function (Faker\Generator $faker) {
+$factory->define(PlanFeature::class, function (Generator $faker) {
     return [
         'plan_id' => factory(Plan::class)->create()->id,
-        'code' => $faker->word,
-        'value' => $faker->randomElement(['10','20','30','50','Y','N','UNLIMITED']),
+        'feature_id' => factory(Feature::class)->create()->id,
+        'value' => $faker->randomElement(['10','20','30','50','Y','N','UNLIMITED', null]),
     ];
 });

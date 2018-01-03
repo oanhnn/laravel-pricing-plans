@@ -1,29 +1,47 @@
 <?php
 
-namespace Laravel\PricingPlans\Model;
+namespace Laravel\PricingPlans\Models;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\PricingPlans\Contracts\PlanInterface;
-use Laravel\PricingPlans\Contracts\PlanSubscriptionInterface;
+use Illuminate\Support\Facades\Event;
+use InvalidArgumentException;
+use Laravel\PricingPlans\Events\SubscriptionRenewed;
 use Laravel\PricingPlans\Period;
 use Laravel\PricingPlans\SubscriptionAbility;
 use Laravel\PricingPlans\SubscriptionUsageManager;
-use Laravel\PricingPlans\Traits\BelongsToPlan;
+use Laravel\PricingPlans\Models\Concerns\BelongsToPlanModel;
 use LogicException;
 
-class PlanSubscription extends Model implements PlanSubscriptionInterface
+/**
+ * Class PlanSubscription
+ * @package Laravel\PricingPlans\Models
+ * @property int    $id
+ * @property string $subscriber_type
+ * @property int    $subscriber_id
+ * @property int    $plan_id
+ * @property string $name
+ * @property \Carbon\Carbon $starts_at
+ * @property \Carbon\Carbon $ends_at
+ * @property \Carbon\Carbon $canceled_at
+ * @property \Carbon\Carbon $trial_ends_at
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property-read \Laravel\PricingPlans\Models\Plan $plan
+ */
+class PlanSubscription extends Model
 {
-    use BelongsToPlan;
+    use BelongsToPlanModel;
 
     /**
      * Subscription statuses
      */
     const STATUS_ACTIVE = 'active';
     const STATUS_CANCELED = 'canceled';
+    const STATUS_ENDED = 'ended';
 
     /**
      * The attributes that are mass assignable.
@@ -31,8 +49,6 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
      * @var array
      */
     protected $fillable = [
-        'user_id',
-        'plan_id',
         'name',
         'trial_ends_at',
         'starts_at',
@@ -46,8 +62,12 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
      * @var array
      */
     protected $dates = [
-        'created_at', 'updated_at',
-        'canceled_at', 'trial_ends_at', 'ends_at', 'starts_at'
+        'created_at',
+        'updated_at',
+        'starts_at',
+        'ends_at',
+        'canceled_at',
+        'trial_ends_at',
     ];
 
     /**
@@ -68,8 +88,15 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
 
         static::saving(function ($model) {
             // Set period if it wasn't set
-            if (! $model->ends_at) {
+            if (!$model->ends_at) {
                 $model->setNewPeriod();
+            }
+        });
+
+        static::saved(function ($model) {
+            /** @var PlanSubscription $model */
+            if ($model->getOriginal('plan_id') !== $model->plan_id) {
+                Event::dispatch(new SubscriptionPlanChanged($model));
             }
         });
     }
@@ -87,13 +114,13 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
     }
 
     /**
-     * Get user.
+     * Get subscriber.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user()
+    public function subscriber()
     {
-        return $this->belongsTo(Config::get('auth.providers.users.model'));
+        return $this->morphTo();
     }
 
     /**
@@ -104,8 +131,9 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
     public function usage()
     {
         return $this->hasMany(
-            Config::get('plans.models.plan_subscription_usage'),
-            'subscription_id'
+            Config::get('plans.models.PlanSubscriptionUsage'),
+            'subscription_id',
+            'id'
         );
     }
 
@@ -116,12 +144,16 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
      */
     public function getStatusAttribute()
     {
-        if ($this->active()) {
+        if ($this->isActive()) {
             return self::STATUS_ACTIVE;
         }
 
-        if ($this->canceled()) {
+        if ($this->isCanceled()) {
             return self::STATUS_CANCELED;
+        }
+
+        if ($this->isEnded()) {
+            return self::STATUS_ENDED;
         }
     }
 
@@ -130,9 +162,9 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
      *
      * @return bool
      */
-    public function active()
+    public function isActive(): bool
     {
-        if (! $this->ended() or $this->onTrial()) {
+        if (!$this->isEnded() || $this->onTrial()) {
             return true;
         }
 
@@ -144,9 +176,9 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
      *
      * @return bool
      */
-    public function onTrial()
+    public function onTrial(): bool
     {
-        if (! is_null($trialEndsAt = $this->trial_ends_at)) {
+        if (!is_null($trialEndsAt = $this->trial_ends_at)) {
             return Carbon::now()->lt(Carbon::instance($trialEndsAt));
         }
 
@@ -158,9 +190,9 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
      *
      * @return bool
      */
-    public function canceled()
+    public function isCanceled(): bool
     {
-        return  ! is_null($this->canceled_at);
+        return !is_null($this->canceled_at);
     }
 
     /**
@@ -168,18 +200,19 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
      *
      * @return bool
      */
-    public function ended()
+    public function isEnded(): bool
     {
         $endsAt = Carbon::instance($this->ends_at);
 
-        return Carbon::now()->gt($endsAt) or Carbon::now()->eq($endsAt);
+        return Carbon::now()->gte($endsAt);
     }
 
     /**
      * Cancel subscription.
      *
-     * @param  bool $immediately
-     * @return self
+     * @param bool $immediately
+     * @return PlanSubscription
+     * @throws \Throwable
      */
     public function cancel($immediately = false)
     {
@@ -189,7 +222,9 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
             $this->ends_at = $this->canceled_at;
         }
 
-        $this->save();
+        $this->saveOrFail();
+
+        Event::dispatch(new SubscriptionCanceled($this));
 
         return $this;
     }
@@ -197,23 +232,30 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
     /**
      * Change subscription plan.
      *
-     * @param mixed $plan Plan Id or Plan Model Instance
-     * @return self
+     * @param int|\Laravel\PricingPlans\Models\Plan $plan Plan Id or Plan Model Instance
+     * @return PlanSubscription|false
+     * @throws InvalidArgumentException
      */
     public function changePlan($plan)
     {
         if (is_numeric($plan)) {
-            $plan = App::make(PlanInterface::class)->find($plan);
+            $plan = App::make(Config::get('plans.models.Plan'))->find($plan);
+        }
+
+        if (is_null($plan) || !($plan instanceof Plan)) {
+            throw new InvalidArgumentException('Invalid plan instance');
         }
 
         // If plans doesn't have the same billing frequency (e.g., interval
         // and interval_count) we will update the billing dates starting
-        // today... and sice we are basically creating a new billing cycle,
+        // today... and since we are basically creating a new billing cycle,
         // the usage data will be cleared.
-        if (is_null($this->plan) or $this->plan->interval !== $plan->interval or
-                $this->plan->interval_count !== $plan->interval_count) {
+        if (is_null($this->plan) ||
+            $this->plan->interval_unit !== $plan->interval_unit ||
+            $this->plan->interval_count !== $plan->interval_count
+        ) {
             // Set period
-            $this->setNewPeriod($plan->interval, $plan->interval_count);
+            $this->setNewPeriod($plan->interval_unit, $plan->interval_count);
 
             // Clear usage data
             $usageManager = new SubscriptionUsageManager($this);
@@ -229,12 +271,12 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
     /**
      * Renew subscription period.
      *
-     * @throws LogicException
      * @return self
+     * @throws LogicException
      */
     public function renew()
     {
-        if ($this->ended() and $this->canceled()) {
+        if ($this->isEnded() and $this->isCanceled()) {
             throw new LogicException(
                 'Unable to renew canceled ended subscription.'
             );
@@ -252,6 +294,8 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
             $subscription->canceled_at = null;
             $subscription->save();
         });
+
+        Event::dispatch(new SubscriptionRenewed($this));
 
         return $this;
     }
@@ -274,17 +318,20 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
      * Find by user id.
      *
      * @param  \Illuminate\Database\Eloquent\Builder
-     * @param  int $user_id
+     * @param  \Illuminate\Database\Eloquent\Model $subscriber
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeByUser($query, $user_id)
+    public function scopeBySubscriber($query, $subscriber)
     {
-        return $query->where('user_id', $user_id);
+        return $query->where('subscriber_id', $subscriber->getKey())
+                ->where('subscriber_type', get_class($subscriber));
     }
 
     /**
      * Find subscription with an ending trial.
      *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param int $dayRange
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeFindEndingTrial($query, $dayRange = 3)
@@ -292,22 +339,25 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
         $from = Carbon::now();
         $to = Carbon::now()->addDays($dayRange);
 
-        $query->whereBetween('trial_ends_at', [$from, $to]);
+        return $query->whereBetween('trial_ends_at', [$from, $to]);
     }
 
     /**
      * Find subscription with an ended trial.
      *
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeFindEndedTrial($query)
     {
-        $query->where('trial_ends_at', '<=', date('Y-m-d H:i:s'));
+        return $query->where('trial_ends_at', '<=', Carbon::now());
     }
 
     /**
      * Find ending subscriptions.
      *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param int $dayRange
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeFindEndingPeriod($query, $dayRange = 3)
@@ -315,41 +365,42 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
         $from = Carbon::now();
         $to = Carbon::now()->addDays($dayRange);
 
-        $query->whereBetween('ends_at', [$from, $to]);
+        return $query->whereBetween('ends_at', [$from, $to]);
     }
 
     /**
      * Find ended subscriptions.
      *
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeFindEndedPeriod($query)
     {
-        $query->where('ends_at', '<=', date('Y-m-d H:i:s'));
+        return $query->where('ends_at', '<=', Carbon::now());
     }
 
     /**
      * Set subscription period.
      *
-     * @param  string $interval
+     * @param  string $intervalUnit
      * @param  int $intervalCount
-     * @param  string $start Start date
-     * @return  self
+     * @param  string $startAt Start time
+     * @return  PlanSubscription
      */
-    protected function setNewPeriod($interval = '', $intervalCount = 0, $start = '')
+    protected function setNewPeriod($intervalUnit = '', $intervalCount = 0, $startAt = '')
     {
-        if (empty($interval)) {
-            $interval = $this->plan->interval;
+        if (empty($intervalUnit)) {
+            $intervalUnit = $this->plan->interval_unit;
         }
 
         if (empty($intervalCount)) {
             $intervalCount = $this->plan->interval_count;
         }
 
-        $period = new Period($interval, $intervalCount, $start);
+        $period = new Period($intervalUnit, $intervalCount, $startAt);
 
-        $this->starts_at = $period->getStartDate();
-        $this->ends_at = $period->getEndDate();
+        $this->starts_at = $period->getStartAt();
+        $this->ends_at = $period->getEndAt();
 
         return $this;
     }

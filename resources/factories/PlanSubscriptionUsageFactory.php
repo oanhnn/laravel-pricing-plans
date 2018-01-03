@@ -1,14 +1,15 @@
 <?php
 
-use Laravel\PricingPlans\Model\PlanSubscription;
-use Laravel\PricingPlans\Model\PlanSubscriptionUsage;
+use Faker\Generator;
+use Laravel\PricingPlans\Models\Feature;
+use Laravel\PricingPlans\Models\PlanSubscription;
+use Laravel\PricingPlans\Models\PlanSubscriptionUsage;
 
-$factory->define(PlanSubscriptionUsage::class, function (Faker\Generator $faker) {
+$factory->define(PlanSubscriptionUsage::class, function (Generator $faker) {
     return [
-        'name' => $faker->word,
         'subscription_id' => factory(PlanSubscription::class)->create()->id,
-        'code' => $faker->word,
+        'feature_id' => factory(Feature::class)->create()->id,
         'used' => rand(1, 50),
-        'valid_until' => $faker->dateTime()
+        'valid_until' => $faker->dateTime(),
     ];
 });

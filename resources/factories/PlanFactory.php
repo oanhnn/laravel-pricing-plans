@@ -1,12 +1,16 @@
 <?php
 
-use Laravel\PricingPlans\Model\Plan;
+use Faker\Generator;
+use Laravel\PricingPlans\Models\Plan;
+use Laravel\PricingPlans\Period;
 
-$factory->define(Plan::class, function (Faker\Generator $faker) {
+$factory->define(Plan::class, function (Generator $faker) {
     return [
         'name' => $faker->word,
         'description' => $faker->sentence,
         'price' => rand(0, 9),
-        'interval' => $faker->randomElement(['month','year'])
+        'interval_unit' => $faker->randomElement([Period::MONTH, Period::YEAR]),
+        'interval_count' => 1,
+        'trial_period_days' => $faker->numberBetween(0, 10),
     ];
 });

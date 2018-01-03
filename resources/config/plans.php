@@ -27,6 +27,7 @@ return [
     |
     */
     'tables' => [
+        'features'                 => 'features',
         'plans'                    => 'plans',
         'plan_features'            => 'plan_features',
         'plan_subscriptions'       => 'plan_subscriptions',
@@ -43,26 +44,11 @@ return [
     |
     */
     'models' => [
-        'Plan'                  => 'Laravel\PricingPlans\Model\Plan',
-        'PlanFeature'           => 'Laravel\PricingPlans\Model\PlanFeature',
-        'PlanSubscription'      => 'Laravel\PricingPlans\Model\PlanSubscription',
-        'PlanSubscriptionUsage' => 'Laravel\PricingPlans\Model\PlanSubscriptionUsage',
+        'Feature'               => 'Laravel\\PricingPlans\\Models\\Feature',
+        'Plan'                  => 'Laravel\\PricingPlans\\Models\\Plan',
+        'PlanFeature'           => 'Laravel\\PricingPlans\\Models\\PlanFeature',
+        'PlanSubscription'      => 'Laravel\\PricingPlans\\Models\\PlanSubscription',
+        'PlanSubscriptionUsage' => 'Laravel\\PricingPlans\\Models\\PlanSubscriptionUsage',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Features
-    |--------------------------------------------------------------------------
-    |
-    | The heart of this package. Here you will specify all features available
-    | for your plans.
-    |
-    */
-    'features' => [
-        'SAMPLE_SIMPLE_FEATURE',
-        'SAMPLE_DEFINED_FEATURE' => [
-            'reseteable_interval' => 'month',
-            'reseteable_count' => 2
-        ],
-    ],
 ];

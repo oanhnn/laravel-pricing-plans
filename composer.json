@@ -1,47 +1,64 @@
 {
-    "name": "oanhnn/laravel-pricing-plans",
-    "type": "library",
-    "description": "A package provide pricing plans for Laravel.",
-    "keywords": ["plans", "laravel", "subscriptions", "pricing"],
-    "license": "MIT",
-    "homepage": "https://github.com/oanhnn/laravel-flash-message",
-    "support": {
-        "issues": "https://github.com/oanhnn/laravel-flash-message/issues",
-        "source": "https://github.com/oanhnn/laravel-flash-message"
-    },
-    "authors": [
-        {
-            "name": "Oanh Nguyen",
-            "email": "oanhnn.bk@gmail.com"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "Laravel\\PricingPlans\\": "src/"
-        }
-    },
-    "require": {
-        "php": ">=7.0",
-        "illuminate/container": "5.4.*",
-        "illuminate/contracts": "5.4.*",
-        "illuminate/database": "5.4.*",
-        "illuminate/support": "5.4.*",
-        "nesbot/carbon": "~1.21"
-    },
-    "require-dev": {
-        "fzaninotto/faker": "~1.4",
-        "mockery/mockery": "~0.9",
-        "phpunit/phpunit": "~6.1",
-        "squizlabs/php_codesniffer": "^3.0"
-    },
-    "scripts": {
-        "phpunit": "php vendor/phpunit/phpunit/phpunit --coverage-html build/coverage",
-        "phpcs": "php vendor/squizlabs/php_codesniffer/bin/phpcs",
-        "phpcbf": "php vendor/squizlabs/php_codesniffer/bin/phpcbf"
-    },
-    "config": {
-        "preferred-install": "dist",
-        "sort-packages": true,
-        "optimize-autoloader": true
+  "name": "oanhnn/laravel-pricing-plans",
+  "type": "library",
+  "description": "A package provide pricing plans for Laravel.",
+  "keywords": [
+    "plans",
+    "laravel",
+    "subscriptions",
+    "pricing"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/oanhnn/laravel-pricing-plans",
+  "support": {
+    "issues": "https://github.com/oanhnn/laravel-pricing-plans/issues",
+    "source": "https://github.com/oanhnn/laravel-pricing-plans"
+  },
+  "authors": [
+    {
+      "name": "Oanh Nguyen",
+      "email": "oanhnn.bk@gmail.com"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Laravel\\PricingPlans\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=7.0",
+    "illuminate/cache": "5.4.*|5.5.*",
+    "illuminate/container": "5.4.*|5.5.*",
+    "illuminate/contracts": "5.4.*|5.5.*",
+    "illuminate/database": "5.4.*|5.5.*",
+    "illuminate/events": "5.4.*|5.5.*",
+    "illuminate/queue": "5.4.*|5.5.*",
+    "illuminate/support": "5.4.*|5.5.*",
+    "nesbot/carbon": "~1.21"
+  },
+  "require-dev": {
+    "fzaninotto/faker": "~1.4",
+    "mockery/mockery": "~0.9",
+    "phpunit/phpunit": "~6.1",
+    "squizlabs/php_codesniffer": "^3.0"
+  },
+  "scripts": {
+    "phpunit": "php vendor/phpunit/phpunit/phpunit --coverage-html build/coverage",
+    "phpcs": "php vendor/squizlabs/php_codesniffer/bin/phpcs",
+    "phpcbf": "php vendor/squizlabs/php_codesniffer/bin/phpcbf"
+  },
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "optimize-autoloader": true
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Laravel\\PricingPlans\\PricingPlansServiceProvider"
+      ],
+      "aliases": {
+      }
+    }
+  }
 }

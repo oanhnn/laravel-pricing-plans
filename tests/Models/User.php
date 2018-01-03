@@ -1,14 +1,14 @@
 <?php
 
-namespace Laravel\PricingPlans\Tests\Model;
+namespace Laravel\PricingPlans\Tests\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Laravel\PricingPlans\Contracts\PlanSubscriberInterface;
-use Laravel\PricingPlans\Traits\PlanSubscriber;
+use Laravel\PricingPlans\Contracts\Subscriber;
+use Laravel\PricingPlans\Models\Concerns\Subscribable;
 
-class User extends Model implements PlanSubscriberInterface
+class User extends Model implements Subscriber
 {
-    use PlanSubscriber;
+    use Subscribable;
 
     /**
      * The attributes that are mass assignable.

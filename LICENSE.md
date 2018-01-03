@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright © 2017 Oanh Nguyen <oanhnn.bk@gmail.com>
+Copyright © 2017-2018 Oanh Nguyen <oanhnn.bk@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
