@@ -3,6 +3,7 @@
 namespace Laravel\PricingPlans;
 
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Support\Facades\Lang;
 use InvalidArgumentException;
 
@@ -66,12 +67,14 @@ class Period
      */
     public function __construct($intervalUnit = 'month', $intervalCount = 1, $startAt = '')
     {
-        if (empty($startAt)) {
+        if ($startAt instanceof DateTime) {
+            $this->startAt = Carbon::instance($startAt);
+        } elseif (is_int($startAt)) {
+            $this->startAt = Carbon::createFromTimestamp($startAt);
+        } elseif (empty($startAt)) {
             $this->startAt = new Carbon();
-        } elseif (!$startAt instanceof Carbon) {
-            $this->startAt = Carbon::parse($startAt);
         } else {
-            $this->startAt = $startAt;
+            $this->startAt = Carbon::parse($startAt);
         }
 
         if (!self::isValidIntervalUnit($intervalUnit)) {
@@ -135,7 +138,7 @@ class Period
     protected function calculate()
     {
         $method = $this->getMethod();
-        $this->endAt = clone($this->startAt)->$method($this->intervalCount);
+        $this->endAt = (clone $this->startAt)->$method($this->intervalCount);
     }
 
     /**

@@ -24,6 +24,7 @@ use LogicException;
  * @property int    $subscriber_id
  * @property int    $plan_id
  * @property string $name
+ * @property bool   $canceled_immediately
  * @property \Carbon\Carbon $starts_at
  * @property \Carbon\Carbon $ends_at
  * @property \Carbon\Carbon $canceled_at
@@ -196,6 +197,16 @@ class PlanSubscription extends Model
     }
 
     /**
+     * Check if subscription is canceled immediately.
+     *
+     * @return bool
+     */
+    public function isCanceledImmediately(): bool
+    {
+        return !is_null($this->canceled_at) && $this->canceled_immediately === true;
+    }
+
+    /**
      * Check if subscription period has ended.
      *
      * @return bool
@@ -219,6 +230,7 @@ class PlanSubscription extends Model
         $this->canceled_at = Carbon::now();
 
         if ($immediately) {
+            $this->canceled_immediately = true;
             $this->ends_at = $this->canceled_at;
         }
 
@@ -318,7 +330,7 @@ class PlanSubscription extends Model
      * Find by user id.
      *
      * @param  \Illuminate\Database\Eloquent\Builder
-     * @param  \Illuminate\Database\Eloquent\Model $subscriber
+     * @param  \Laravel\PricingPlans\Contracts\Subscriber $subscriber
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeBySubscriber($query, $subscriber)

@@ -25,11 +25,11 @@ trait BelongsToPlanModel
      * Scope by plan id.
      *
      * @param  \Illuminate\Database\Eloquent\Builder
-     * @param  int $plan_id
+     * @param  int $planId
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeByPlan($query, $plan_id)
+    public function scopeByPlan($query, $planId)
     {
-        return $query->where('plan_id', $plan_id);
+        return $query->where('plan_id', $planId);
     }
 }

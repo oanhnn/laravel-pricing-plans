@@ -1,0 +1,21 @@
+language: php
+
+php:
+  - 7.0
+  - 7.1
+
+sudo: false
+
+before_install:
+  - composer self-update
+
+install:
+  - composer install
+  - composer require satooshi/php-coveralls:~1.0
+
+script:
+  - php vendor/bin/phpcs
+  - php vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+
+after_script:
+  - php vendor/bin/coveralls -v

@@ -32,13 +32,11 @@
     <!-- Exclude some PHP files, it haven't class definitions -->
     <rule ref="PSR1.Classes.ClassDeclaration">
         <exclude-pattern>resources/</exclude-pattern>
-        <exclude-pattern>tests/bootstrap.php</exclude-pattern>
     </rule>
 
     <!-- Exclude some PHP config files -->
     <rule ref="PSR1.Files.SideEffects">
         <exclude-pattern>resources/</exclude-pattern>
-        <exclude-pattern>tests/bootstrap.php</exclude-pattern>
     </rule>
 
     <!-- Paths to check -->
@@ -46,5 +44,5 @@
     <file>src</file>
     <file>tests</file>
 
-    <!-- <exclude-pattern>tests/bootstrap.php</exclude-pattern> -->
+    <exclude-pattern>tests/bootstrap.php</exclude-pattern>
 </ruleset>
