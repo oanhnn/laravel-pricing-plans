@@ -7,23 +7,27 @@ use Faker\Factory as FakerFactory;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
 use Laravel\PricingPlans\PricingPlansServiceProvider;
 use Laravel\PricingPlans\Tests\Models\User;
+use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as Testbench;
 
 class TestCase extends Testbench
 {
     /**
-     * Setup the test enviroment.
+     * Setup the test environment.
      *
-     * @return void
+     * @throws \Exception
      */
     public function setUp()
     {
         parent::setUp();
 
+        // Run Laravel migrations
+        $this->loadLaravelMigrations('testbench');
+
         // Run package migrations
-        $this->artisan('migrate', [
+        $this->loadMigrationsFrom([
             '--database' => 'testbench',
-            '--path' => realpath(__DIR__ . '/../resources/migrations'),
+            '--realpath' => realpath(__DIR__ . '/../resources/migrations'),
         ]);
     }
 
@@ -55,7 +59,10 @@ class TestCase extends Testbench
      */
     public function getPackageProviders($app)
     {
-        return [PricingPlansServiceProvider::class];
+        return [
+            ConsoleServiceProvider::class,
+            PricingPlansServiceProvider::class,
+        ];
     }
 
     /**

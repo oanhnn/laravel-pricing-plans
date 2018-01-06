@@ -84,7 +84,7 @@ class PlanSubscriptionUsage extends Model
      * Scope by feature code.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int|Feature $feature
+     * @param int|\Laravel\PricingPlans\Models\Feature $feature
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeByFeature($query, $feature)

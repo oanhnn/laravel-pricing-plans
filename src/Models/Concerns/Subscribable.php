@@ -4,29 +4,11 @@ namespace Laravel\PricingPlans\Models\Concerns;
 
 use Illuminate\Support\Facades\Config;
 use Laravel\PricingPlans\Models\Plan;
-use Laravel\PricingPlans\Models\PlanSubscription;
 use Laravel\PricingPlans\SubscriptionBuilder;
 use Laravel\PricingPlans\SubscriptionUsageManager;
 
 trait Subscribable
 {
-    /**
-     * Get a subscription by name.
-     *
-     * @param  string $name
-     * @return PlanSubscription|null
-     */
-    public function subscription($name = 'default')
-    {
-        return $this->subscriptions
-            ->sortByDesc(function ($value) {
-                return $value->created_at->getTimestamp();
-            })
-            ->first(function ($subscription) use ($name) {
-                return $subscription->name === $name;
-            });
-    }
-
     /**
      * Get user plan subscription.
      *
@@ -41,13 +23,37 @@ trait Subscribable
     }
 
     /**
+     * Get a subscription by name.
+     *
+     * @param  string $name Subscription name
+     * @return \Laravel\PricingPlans\Models\PlanSubscription|null
+     */
+    public function subscription(string $name = 'default')
+    {
+        if ($this->relationLoaded('subscriptions')) {
+            return $this->subscriptions
+                ->orderByDesc(function ($subscription) {
+                    return $subscription->created_at->getTimestamp();
+                })
+                ->first(function ($subscription) use ($name) {
+                    return $subscription->name === $name;
+                });
+        }
+
+        return $this->subscriptions()
+            ->where('name', $name)
+            ->orderByDesc('created_at')
+            ->first();
+    }
+
+    /**
      * Check if the user has a given subscription.
      *
-     * @param  string $subscription
-     * @param  int $planId
+     * @param  string $subscription Subscription name
+     * @param  int|null $planId
      * @return bool
      */
-    public function subscribed($subscription = 'default', $planId = null): bool
+    public function subscribed(string $subscription, $planId = null): bool
     {
         $subscription = $this->subscription($subscription);
 
@@ -65,7 +71,7 @@ trait Subscribable
     /**
      * Subscribe user to a new plan.
      *
-     * @param string $subscription
+     * @param string $subscription Subscription name
      * @param \Laravel\PricingPlans\Models\Plan $plan
      * @return \Laravel\PricingPlans\SubscriptionBuilder
      */
@@ -77,10 +83,10 @@ trait Subscribable
     /**
      * Get subscription usage manager instance.
      *
-     * @param  string $subscription
+     * @param  string $subscription Subscription name
      * @return \Laravel\PricingPlans\SubscriptionUsageManager
      */
-    public function subscriptionUsage($subscription = 'default')
+    public function subscriptionUsage($subscription)
     {
         return new SubscriptionUsageManager($this->subscription($subscription));
     }

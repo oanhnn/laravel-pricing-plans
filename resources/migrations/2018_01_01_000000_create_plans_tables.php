@@ -4,7 +4,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Config;
 
-class CreatePlansTable extends Migration
+class CreatePlansTables extends Migration
 {
     /**
      * Run the migrations.
@@ -43,7 +43,7 @@ class CreatePlansTable extends Migration
             $table->increments('id');
             $table->integer('plan_id')->unsigned();
             $table->integer('feature_id')->unsigned();
-            $table->integer('value');
+            $table->string('value');
             $table->text('note')->nullable();
             $table->timestamps();
 

@@ -14,10 +14,8 @@ class PeriodTest extends TestCase
 {
     /**
      * Can get all intervals with translations.
-     *
-     * @test
      */
-    public function it_can_get_all_intervals_with_translations()
+    public function testItCanGetAllIntervalsWithTranslations()
     {
         App::setLocale('en');
         $intervals = Period::getAllIntervals();
@@ -36,10 +34,9 @@ class PeriodTest extends TestCase
      * @param mixed $start
      * @param \DateTime $expectedStartAt
      * @param \DateTime $expectedEndAt
-     * @test
      * @dataProvider periodDataProvider
      */
-    public function it_can_calculate_a_period($unit, $count, $start, $expectedStartAt, $expectedEndAt)
+    public function testItCanCalculateAPeriod($unit, $count, $start, $expectedStartAt, $expectedEndAt)
     {
         $period = new Period($unit, $count, $start);
 
@@ -85,10 +82,8 @@ class PeriodTest extends TestCase
 
     /**
      * It throws exception when a invalid feature is passed.
-     *
-     * @test
      */
-    public function it_throw_exception_on_invalid_interval()
+    public function testItThrowExceptionOnInvalidInterval()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Interval unit `dummy` is invalid');
@@ -96,9 +91,9 @@ class PeriodTest extends TestCase
     }
 
     /**
-     * @test
+     * It can validate interval unit
      */
-    public function it_can_validate_interval_unit()
+    public function testItCanValidateIntervalUnit()
     {
         $this->assertTrue(Period::isValidIntervalUnit('day'));
         $this->assertTrue(Period::isValidIntervalUnit('month'));

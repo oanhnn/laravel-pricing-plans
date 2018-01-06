@@ -19,12 +19,12 @@ use LogicException;
 /**
  * Class PlanSubscription
  * @package Laravel\PricingPlans\Models
- * @property int    $id
+ * @property int $id
  * @property string $subscriber_type
- * @property int    $subscriber_id
- * @property int    $plan_id
+ * @property int $subscriber_id
+ * @property int $plan_id
  * @property string $name
- * @property bool   $canceled_immediately
+ * @property bool $canceled_immediately
  * @property \Carbon\Carbon $starts_at
  * @property \Carbon\Carbon $ends_at
  * @property \Carbon\Carbon $canceled_at
@@ -336,7 +336,7 @@ class PlanSubscription extends Model
     public function scopeBySubscriber($query, $subscriber)
     {
         return $query->where('subscriber_id', $subscriber->getKey())
-                ->where('subscriber_type', get_class($subscriber));
+            ->where('subscriber_type', get_class($subscriber));
     }
 
     /**
@@ -396,10 +396,10 @@ class PlanSubscription extends Model
      *
      * @param  string $intervalUnit
      * @param  int $intervalCount
-     * @param  string $startAt Start time
+     * @param  null|int|string|\DateTime $startAt Start time
      * @return  PlanSubscription
      */
-    protected function setNewPeriod($intervalUnit = '', $intervalCount = 0, $startAt = '')
+    protected function setNewPeriod(string $intervalUnit = '', int $intervalCount = 0, $startAt = null)
     {
         if (empty($intervalUnit)) {
             $intervalUnit = $this->plan->interval_unit;

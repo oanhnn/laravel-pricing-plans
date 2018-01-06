@@ -54,9 +54,9 @@ Easy provide pricing plans for Your Laravel 5.4+ Application.
 
 ## TODO
 
-- [ ] Make better document
 - [ ] Caching some select query
 - [ ] Add unit test scripts
+- [ ] Make better document
 
 ## Requirements
 
@@ -147,7 +147,7 @@ $feature2 = Feature::create([
     'description' => null,
     'interval_unit' => 'day',
     'interval_count' => 1,
-    'sort_order' => 1,
+    'sort_order' => 2,
 ]);
 
 $plan = Plan::create([

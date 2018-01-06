@@ -94,8 +94,8 @@ class Plan extends Model
         return $this->belongsToMany(
             Config::get('plans.models.Feature'),
             Config::get('plans.tables.plan_features'),
-            'feature_id',
-            'plan_id'
+            'plan_id',
+            'feature_id'
         )->using(Config::get('plans.models.PlanFeature'));
     }
 

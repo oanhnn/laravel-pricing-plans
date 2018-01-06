@@ -9,24 +9,24 @@ interface Subscriber
     /**
      * Get a subscription by name.
      *
-     * @param  string $name
-     * @return PlanSubscription|null
+     * @param  string $name Subscription name
+     * @return \Laravel\PricingPlans\Models\PlanSubscription|null
      */
-    public function subscription($name = 'default');
+    public function subscription(string $name = 'default');
 
     /**
      * Check if the user has a given subscription.
      *
-     * @param  string $subscription
+     * @param  string $subscription Subscription name
      * @param  int $planId
      * @return bool
      */
-    public function subscribed($subscription = 'default', $planId = null): bool;
+    public function subscribed(string $subscription, $planId = null): bool;
 
     /**
      * Subscribe user to a new plan.
      *
-     * @param string $subscription
+     * @param string $subscription Subscription name
      * @param \Laravel\PricingPlans\Models\Plan $plan
      * @return \Laravel\PricingPlans\SubscriptionBuilder
      */
@@ -35,8 +35,8 @@ interface Subscriber
     /**
      * Get subscription usage manager instance.
      *
-     * @param  string $subscription
+     * @param string $subscription Subscription name
      * @return \Laravel\PricingPlans\SubscriptionUsageManager
      */
-    public function subscriptionUsage($subscription = 'default');
+    public function subscriptionUsage(string $subscription);
 }

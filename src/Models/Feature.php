@@ -3,6 +3,7 @@
 namespace Laravel\PricingPlans\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Config;
 use Laravel\PricingPlans\Models\Concerns\Resettable;
 
 /**
@@ -31,8 +32,9 @@ class Feature extends Model
      */
     protected $fillable = [
         'name',
-        'code',
         'description',
+        'interval_unit',
+        'interval_count',
         'sort_order',
     ];
 
@@ -66,8 +68,8 @@ class Feature extends Model
         return $this->belongsToMany(
             Config::get('plans.models.Plan'),
             Config::get('plans.tables.plans'),
-            'plan_id',
-            'feature_id'
+            'feature_id',
+            'plan_id'
         )->using(Config::get('plans.models.PlanFeature'));
     }
 

@@ -2,7 +2,6 @@
 
 namespace Laravel\PricingPlans\Models\Concerns;
 
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Lang;
 use Laravel\PricingPlans\Period;
 
@@ -17,7 +16,7 @@ trait Resettable
     {
         $intervals = Period::getAllIntervals();
 
-        return (isset($intervals[$this->interval_unit]) ? $intervals[$this->interval_unit] : null);
+        return $intervals[$this->interval_unit] ?? null;
     }
 
     /**
@@ -39,15 +38,11 @@ trait Resettable
     }
 
     /**
-     * @param string|\Carbon\Carbon $startedAt
+     * @param string|null|int|\DateTime $startedAt
      * @return \Carbon\Carbon
      */
-    public function getResetTime($startedAt = '')
+    public function getResetTime($startedAt = null)
     {
-        if (empty($startedAt)) {
-             $startedAt = new Carbon();
-        }
-
-        return (new Period($this->resettable_interval, $this->resettable_count, $startedAt))->getEndAt();
+        return (new Period($this->interval_unit, $this->interval_count, $startedAt))->getEndAt();
     }
 }

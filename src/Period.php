@@ -62,10 +62,10 @@ class Period
      *
      * @param string $intervalUnit Interval Unit
      * @param int $intervalCount Interval count
-     * @param mixed $startAt Starting point
+     * @param null|string|int|\DateTime $startAt Starting point
      * @throws InvalidArgumentException
      */
-    public function __construct($intervalUnit = 'month', $intervalCount = 1, $startAt = '')
+    public function __construct(string $intervalUnit = 'month', int $intervalCount = 1, $startAt = null)
     {
         if ($startAt instanceof DateTime) {
             $this->startAt = Carbon::instance($startAt);

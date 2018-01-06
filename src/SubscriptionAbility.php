@@ -82,7 +82,7 @@ class SubscriptionAbility
      */
     public function remainings($featureId)
     {
-        return ($this->value($featureId) - $this->consumed($featureId));
+        return (int)$this->value($featureId) - $this->consumed($featureId);
     }
 
     /**

@@ -48,9 +48,9 @@ class SubscriptionBuilder
     /**
      * Create a new subscription builder instance.
      *
-     * @param  mixed  $subscriber
+     * @param  \Illuminate\Database\Eloquent\Model $subscriber
      * @param  string $name  Subscription name
-     * @param  mixed  $plan
+     * @param  \Laravel\PricingPlans\Models\Plan $plan
      */
     public function __construct(Model $subscriber, string $name, Plan $plan)
     {

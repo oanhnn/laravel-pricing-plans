@@ -12,7 +12,7 @@ use Laravel\PricingPlans\Models\Concerns\BelongsToPlanModel;
  * @property int $id
  * @property int $plan_id
  * @property int $feature_id
- * @property int $value
+ * @property int|string $value
  * @property string $note
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at

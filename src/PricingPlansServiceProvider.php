@@ -23,8 +23,8 @@ class PricingPlansServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom($pkg . '/lang', 'plans');
 
         $this->publishes([
-            $pkg . '/migrations/create_plans_table.php'
-            => database_path('migrations/' . date('Y_m_d_His') . '_create_plans_table.php')
+            $pkg . '/migrations/2018_01_01_000000_create_plans_tables.php'
+            => database_path('migrations/' . date('Y_m_d_His') . '_create_plans_tables.php')
         ], 'migrations');
 
         $this->publishes([
