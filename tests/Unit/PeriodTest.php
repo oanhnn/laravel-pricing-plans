@@ -60,7 +60,7 @@ class PeriodTest extends TestCase
         $st4 = new DateTime('2018-01-04 10:20:19');
 
         return [
-            // [ $unit, $count, $startAt, $expectedEndAt],
+            // [ $unit, $count, $startAt, $expectedStartAt, $expectedEndAt],
             ['day', 1, $st1,                   $now, (clone $now)->add(new DateInterval('P1D')) ],
             ['day', 2, $st2,                   $st2, (clone $st2)->add(new DateInterval('P2D')) ],
             ['day', 3, $st3->getTimestamp(),   $st3, (clone $st3)->add(new DateInterval('P3D')) ],
