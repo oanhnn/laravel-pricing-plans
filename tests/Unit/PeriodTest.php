@@ -3,6 +3,7 @@
 namespace Laravel\PricingPlans\Tests\Unit;
 
 use Carbon\Carbon;
+use Closure;
 use DateInterval;
 use DateTime;
 use Illuminate\Support\Facades\App;
@@ -27,7 +28,7 @@ class PeriodTest extends TestCase
     }
 
     /**
-     * Can calculate a daily period.
+     * Can calculate a period.
      *
      * @param string $unit
      * @param int $count
@@ -42,8 +43,7 @@ class PeriodTest extends TestCase
 
         $this->assertSame($unit, $period->getIntervalUnit());
         $this->assertSame($count, $period->getIntervalCount());
-        $this->assertEquals($expectedStartAt->getTimestamp(), $period->getStartAt()->getTimestamp());
-        $this->assertEquals($expectedEndAt->getTimestamp(), $period->getEndAt()->getTimestamp());
+        $this->assertTimeRange($expectedStartAt, $expectedEndAt, $period);
     }
 
     /**
@@ -51,33 +51,41 @@ class PeriodTest extends TestCase
      */
     public function periodDataProvider()
     {
-        $now = Carbon::now();
-        Carbon::setTestNow($now);
-
-        $st1 = '';
-        $st2 = new DateTime('2018-01-04 10:00:09');
-        $st3 = new DateTime('2018-01-04 10:10:09');
-        $st4 = new DateTime('2018-01-04 10:20:19');
+        $st1 = new DateTime('2018-01-04 10:00:09');
+        $st2 = new DateTime('2018-01-04 10:10:09');
+        $st3 = new DateTime('2018-01-04 10:20:19');
 
         return [
             // [ $unit, $count, $startAt, $expectedStartAt, $expectedEndAt],
-            ['day', 1, $st1,                   $now, (clone $now)->add(new DateInterval('P1D')) ],
-            ['day', 2, $st2,                   $st2, (clone $st2)->add(new DateInterval('P2D')) ],
-            ['day', 3, $st3->getTimestamp(),   $st3, (clone $st3)->add(new DateInterval('P3D')) ],
-            ['day', 4, $st4->format('c'),      $st4, (clone $st4)->add(new DateInterval('P4D')) ],
-            ['week', 1, $st1,                  $now, (clone $now)->add(new DateInterval('P7D')) ],
-            ['week', 2, $st2,                  $st2, (clone $st2)->add(new DateInterval('P14D'))],
-            ['week', 3, $st3->getTimestamp(),  $st3, (clone $st3)->add(new DateInterval('P21D'))],
-            ['week', 4, $st4->format('c'),     $st4, (clone $st4)->add(new DateInterval('P28D'))],
-            ['month', 1, $st1,                 $now, (clone $now)->add(new DateInterval('P1M')) ],
-            ['month', 2, $st2,                 $st2, (clone $st2)->add(new DateInterval('P2M')) ],
-            ['month', 3, $st3->getTimestamp(), $st3, (clone $st3)->add(new DateInterval('P3M')) ],
-            ['month', 4, $st4->format('c'),    $st4, (clone $st4)->add(new DateInterval('P4M')) ],
-            ['year', 1, $st1,                  $now, (clone $now)->add(new DateInterval('P1Y')) ],
-            ['year', 2, $st2,                  $st2, (clone $st2)->add(new DateInterval('P2Y')) ],
-            ['year', 3, $st3->getTimestamp(),  $st3, (clone $st3)->add(new DateInterval('P3Y')) ],
-            ['year', 4, $st4->format('c'),     $st4, (clone $st4)->add(new DateInterval('P4Y')) ],
+            ['day',   1, $st1,                 $st1, (clone $st1)->add(new DateInterval('P1D')) ],
+            ['day',   2, $st2->getTimestamp(), $st2, (clone $st2)->add(new DateInterval('P2D')) ],
+            ['day',   3, $st3->format('c'),    $st3, (clone $st3)->add(new DateInterval('P3D')) ],
+            ['week',  1, $st1,                 $st1, (clone $st1)->add(new DateInterval('P7D'))],
+            ['week',  2, $st2->getTimestamp(), $st2, (clone $st2)->add(new DateInterval('P14D'))],
+            ['week',  3, $st3->format('c'),    $st3, (clone $st3)->add(new DateInterval('P21D'))],
+            ['month', 1, $st1,                 $st1, (clone $st1)->add(new DateInterval('P1M')) ],
+            ['month', 2, $st2->getTimestamp(), $st2, (clone $st2)->add(new DateInterval('P2M')) ],
+            ['month', 3, $st3->format('c'),    $st3, (clone $st3)->add(new DateInterval('P3M')) ],
+            ['year',  1, $st1,                 $st1, (clone $st1)->add(new DateInterval('P1Y')) ],
+            ['year',  2, $st2->getTimestamp(), $st2, (clone $st2)->add(new DateInterval('P2Y')) ],
+            ['year',  3, $st3->format('c'),    $st3, (clone $st3)->add(new DateInterval('P3Y')) ],
         ];
+    }
+
+    /**
+     * Can calculate a period without startAt.
+     */
+    public function testItCanCalculateAPeriodWithEmptyStart()
+    {
+        $testNow = Carbon::now();
+
+        $this->wrapWithTestNow(function ($now) {
+            // Case: start at is NULL
+            $this->testItCanCalculateAPeriod('day', 1, null, $now, (clone $now)->add(new DateInterval('P1D')));
+
+            // Case: start at is empty string
+            $this->testItCanCalculateAPeriod('month', 2, '', $now, (clone $now)->add(new DateInterval('P2M')));
+        }, $testNow);
     }
 
     /**
@@ -107,5 +115,27 @@ class PeriodTest extends TestCase
         $this->assertfalse(Period::isValidIntervalUnit('wwek'));
         $this->assertfalse(Period::isValidIntervalUnit('months'));
         $this->assertfalse(Period::isValidIntervalUnit(5));
+    }
+
+    /**
+     * @param Closure $func
+     * @param Carbon|null $dt
+     */
+    protected function wrapWithTestNow(Closure $func, Carbon $dt = null)
+    {
+        Carbon::setTestNow($dt ?: Carbon::now());
+        $func(Carbon::getTestNow());
+        Carbon::setTestNow();
+    }
+
+    /**
+     * @param DateTime $expectedStartAt
+     * @param DateTime $expectedEndAt
+     * @param Period $period
+     */
+    protected function assertTimeRange(DateTime $expectedStartAt, DateTime $expectedEndAt, Period $period)
+    {
+        $this->assertEquals($expectedStartAt->getTimestamp(), $period->getStartAt()->getTimestamp());
+        $this->assertEquals($expectedEndAt->getTimestamp(), $period->getEndAt()->getTimestamp());
     }
 }

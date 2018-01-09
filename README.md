@@ -219,7 +219,7 @@ Other methods are:
 - `remainings`: returns available uses for a particular feature.
 - `value`: returns the feature value.
 
-> All methods share the same signature: e.g. 
+> All methods share the same signature: e.g.    
 >`$user->subscription('main')->ability()->consumed(LPP_FEATURE_UPLOAD_IMAGES);`.
 
 
