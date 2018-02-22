@@ -10,7 +10,7 @@ class SubscriptionUsageManager
     /**
      * Subscription model instance.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var \Laravel\PricingPlans\Models\PlanSubscription
      */
     protected $subscription;
 
@@ -29,18 +29,19 @@ class SubscriptionUsageManager
      *
      * This will create or update a usage record.
      *
-     * @param int $featureId
+     * @param string $featureCode
      * @param int $uses
      * @param bool $incremental
      * @return \Laravel\PricingPlans\Models\PlanSubscriptionUsage
+     * @throws \Throwable
      */
-    public function record($featureId, $uses = 1, $incremental = true)
+    public function record(string $featureCode, $uses = 1, $incremental = true)
     {
         /** @var \Laravel\PricingPlans\Models\Feature $feature */
-        $feature = Feature::findOrFail($featureId);
+        $feature = Feature::findByCode($featureCode);
 
         $usage = $this->subscription->usage()->firstOrNew([
-            'feature_id' => $feature->id,
+            'feature_code' => $feature->code,
         ]);
 
         if ($feature->isResettable()) {
@@ -49,8 +50,7 @@ class SubscriptionUsageManager
                 // Set date from subscription creation date so the reset period match the period specified
                 // by the subscription's plan.
                 $usage->valid_until = $feature->getResetTime($this->subscription->created_at);
-                // TODO:
-            } elseif ($usage->isExpired() === true) {
+            } elseif ($usage->isExpired()) {
                 // If the usage record has been expired, let's assign
                 // a new expiration date and reset the uses to zero.
                 $usage->valid_until = $feature->getResetTime($usage->valid_until);
@@ -60,7 +60,7 @@ class SubscriptionUsageManager
 
         $usage->used = max($incremental ? $usage->used + $uses : $uses, 0);
 
-        $usage->save();
+        $usage->saveOrFail();
 
         return $usage;
     }
@@ -71,6 +71,7 @@ class SubscriptionUsageManager
      * @param int $featureId
      * @param int $uses
      * @return \Laravel\PricingPlans\Models\PlanSubscriptionUsage
+     * @throws \Throwable
      */
     public function reduce($featureId, $uses = 1)
     {

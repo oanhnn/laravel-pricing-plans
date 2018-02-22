@@ -17,6 +17,17 @@ Easy provide pricing plans for Your Laravel 5.4+ Application.
     - [Service Provider](#service-provider)
     - [Config file and Migrations](#config-file-and-migrations)
     - [Contract and Traits](#contract-and-traits)
+- [Config File](#config-file)
+- [Models](#models)
+    - [Feature model](#feature-model) 
+    - [Plan model](#plan-model) 
+    - [PlanFeature model](#planfeature-model) 
+    - [PlanSubscription model](#plansubscription-model) 
+    - [PlanSubscriptionUsage model](#plansubscriptionusage-model) 
+- [Events](#events)
+    - [SubscriptionRenewed event](#subscriptionrenewed-event)
+    - [SubscriptionCanceled event](#subscriptioncanceled-event)
+    - [SubscriptionPlanChanged event](#subscriptionplanchanged-event)
 - [Usage](#usage)
     - [Create features and plan](#create-features-and-plan)
     - [Creating subscriptions](#creating-subscriptions)
@@ -28,17 +39,6 @@ Easy provide pricing plans for Your Laravel 5.4+ Application.
     - [Renew a Subscription](#renew-a-subscription)
     - [Cancel a Subscription](#cancel-a-subscription)
     - [Scopes](#scopes)
-- [Models](#models)
-    - [Feature model](#feature-model) 
-    - [Plan model](#plan-model) 
-    - [PlanFeature model](#planfeature-model) 
-    - [PlanSubscription model](#plansubscription-model) 
-    - [PlanSubscriptionUsage model](#plansubscriptionusage-model) 
-- [Events](#events)
-    - [SubscriptionRenewed event](#subscriptionrenewed-event)
-    - [SubscriptionCanceled event](#subscriptioncanceled-event)
-    - [SubscriptionPlanChanged event](#subscriptionplanchanged-event)
-- [Config File](#config-file)
 - [Changelog](#changelog)
 - [Testing](#testing)
 - [Contributing](#contributing)
@@ -123,6 +123,87 @@ class User extends Authenticatable implements Subscriber
     // ...
 }
 ```
+## Config File
+
+You can configure what database tables, what models to use, list of positive words will use.
+
+Definitions:
+
+- **Positive Words**: Are used to tell if a particular feature is _enabled_. E.g., if the feature `listing_title_bold` 
+   has the value `Y` (_Y_ is one of the positive words) then, that means it's enabled.
+
+Take a look to the `config/plans.php` config file for more details.
+
+## Models
+
+PricingPlans uses 5 models under namespace `Laravel\PricingPlans\Models`. You can change to using extended classes of it by 
+changing models class in config file:
+
+### Feature model
+
+This model is model object of feature
+
+```php
+<?php
+
+namespace App\Models;
+
+use Laravel\PricingPlans\Models\Feature as Model;
+
+class Feature extends Model
+{
+    const FEATURE_UPLOAD_IMAGES = 'upload-images';
+    const FEATURE_UPLOAD_VIDEO = 'upload-video';
+}
+```
+
+### Plan model
+
+This model is model object of plan
+
+```php
+<?php
+namespace App\Models;
+
+use Laravel\PricingPlans\Models\Plan as Model;
+
+class Plan extends Model
+{
+    const PLAN_FREE = 'free';
+    const PLAN_PRO = 'pro';
+}
+```
+
+### PlanFeature model
+
+This model is relation model object between plan and feature
+
+### PlanSubscription model
+
+This model is relation model object between plan and subscriber
+
+### PlanSubscriptionUsage model
+
+This model is object for counting usage feature
+
+For more details take a look to each model and the `Laravel\PricingPlans\Models\Concerns\Subscribable` trait.
+
+## Events
+
+Events are under the namespace `Laravel\PricingPlans\Events`. The following are the events triggered by the package.
+
+### `SubscriptionRenewed` event
+
+Fired when a subscription is renewed using the `renew()` method.
+
+### `SubscriptionCanceled` event
+
+Fired when a subscription is canceled using the `cancel()` method.
+
+### `SubscriptionPlanChanged` event
+
+Fired when a subscription's plan is changed. This will be triggered once the `PlanSubscription` model is saved. 
+Plan change is determine by comparing the original and current value of `plan_id`.
 
 ## Usage
 
@@ -135,7 +216,8 @@ use Laravel\PricingPlans\Models\Feature;
 use Laravel\PricingPlans\Models\Plan;
 
 $feature1 = Feature::create([
-    'name' => 'upload images',
+    'name' => 'Upload images',
+    'code' => 'upload-images',
     'description' => null,
     'interval_unit' => 'day',
     'interval_count' => 1,
@@ -144,6 +226,7 @@ $feature1 = Feature::create([
 
 $feature2 = Feature::create([
     'name' => 'upload video',
+    'code' => 'upload-video',
     'description' => null,
     'interval_unit' => 'day',
     'interval_count' => 1,
@@ -152,6 +235,7 @@ $feature2 = Feature::create([
 
 $plan = Plan::create([
     'name' => 'Pro',
+    'code' => 'pro',
     'description' => 'Pro plan',
     'price' => 9.99,
     'interval_unit' => 'month',
@@ -164,10 +248,6 @@ $plan->features()->attach([
     $feature1->id => ['value' => 5, 'note' => 'Can upload maximum 5 images daily'],
     $feature2->id => ['value' => 1, 'note' => 'Can upload maximum 1 video daily'],
 ]);
-
-define('LPP_FEATURE_UPLOAD_IMAGES', $feature1->id);
-define('LPP_FEATURE_UPLOAD_VIDEO', $feature2->id);
-define('LPP_PLAN_PRO', $plan->id);
 ```
 
 ### Creating subscriptions
@@ -184,7 +264,7 @@ use Illuminate\Support\Facades\Auth;
 use Laravel\PricingPlans\Models\Plan;
 
 $user = Auth::user();
-$plan = Plan::find(LPP_PLAN_PRO);
+$plan = Plan::findByCode(Plan::PLAN_PRO);
 
 $user->newSubscription('main', $plan)->create();
 ```
@@ -209,7 +289,7 @@ The `canUse` method returns `true` or `false` depending on multiple factors:
 - Or feature has remaining uses available.
 
 ```php
-$user->subscription('main')->ability()->canUse(LPP_FEATURE_UPLOAD_IMAGES);
+$user->subscription('main')->ability()->canUse(Feature::FEATURE_UPLOAD_IMAGES);
 ```
 
 Other methods are:
@@ -220,7 +300,7 @@ Other methods are:
 - `value`: returns the feature value.
 
 > All methods share the same signature: e.g.    
->`$user->subscription('main')->ability()->consumed(LPP_FEATURE_UPLOAD_IMAGES);`.
+>`$user->subscription('main')->ability()->consumed(Feature::FEATURE_UPLOAD_IMAGES);`.
 
 
 ### Record Feature Usage
@@ -230,7 +310,7 @@ In order to efectively use the ability methods you will need to keep track of ev
 method:
 
 ```php
-$user->subscriptionUsage('main')->record(LPP_FEATURE_UPLOAD_IMAGES);
+$user->subscriptionUsage('main')->record(Feature::FEATURE_UPLOAD_IMAGES);
 ```
 
 The `record` method accept 3 parameters: the first one is the feature's code, the second one is the quantity of 
@@ -239,10 +319,10 @@ when disabled the usage will be override by the quantity provided. E.g.:
 
 ```php
 // Increment by 2
-$user->subscriptionUsage('main')->record(LPP_FEATURE_UPLOAD_IMAGES, 2);
+$user->subscriptionUsage('main')->record(Feature::FEATURE_UPLOAD_IMAGES, 2);
 
 // Override with 9
-$user->subscriptionUsage('main')->record(LPP_FEATURE_UPLOAD_IMAGES, 9, false);
+$user->subscriptionUsage('main')->record(Feature::FEATURE_UPLOAD_IMAGES, 9, false);
 ```
 
 ### Reduce Feature Usage
@@ -251,7 +331,7 @@ Reducing the feature usage is _almost_ the same as incrementing it. Here we only
 to the actual usage:
 
 ```php
-$user->subscriptionUsage('main')->reduce(LPP_FEATURE_UPLOAD_IMAGES, 2);
+$user->subscriptionUsage('main')->reduce(Feature::FEATURE_UPLOAD_IMAGES, 2);
 ```
 
 ### Clear The Subscription Usage Data
@@ -335,88 +415,6 @@ $subscriptions = PlanSubscription::findEndingPeriod(3)->get();
 // Get subscriptions with ended period:
 $subscriptions = PlanSubscription::findEndedPeriod()->get();
 ```
-
-## Models
-
-PricingPlans uses 5 models under namespace `Laravel\PricingPlans\Models`. You can change to using extended classes of it by 
-changing models class in config file:
-
-### Feature model
-
-This model is model object of feature
-
-```php
-<?php
-
-namespace App\Models;
-
-use Laravel\PricingPlans\Models\Feature as Model;
-
-class Feature extends Model
-{
-    const FEATURE_UPLOAD_IMAGES = 1;
-    const FEATURE_UPLOAD_VIDEO = 2;
-}
-```
-
-### Plan model
-
-This model is model object of plan
-
-```php
-<?php
-namespace App\Models;
-
-use Laravel\PricingPlans\Models\Plan as Model;
-
-class Plan extends Model
-{
-    const PLAN_FREE = 1;
-    const PLAN_PRO = 2;
-}
-```
-
-### PlanFeature model
-
-This model is relation model object between plan and feature
-
-### PlanSubscription model
-
-This model is relation model object between plan and subscriber
-
-### PlanSubscriptionUsage model
-
-This model is object for counting usage feature
-
-For more details take a look to each model and the `Laravel\PricingPlans\Models\Concerns\Subscribable` trait.
-
-## Events
-
-Events are under the namespace `Laravel\PricingPlans\Events`. The following are the events triggered by the package.
-
-### `SubscriptionRenewed` event
-
-Fired when a subscription is renewed using the `renew()` method.
-
-### `SubscriptionCanceled` event
-
-Fired when a subscription is canceled using the `cancel()` method.
-
-### `SubscriptionPlanChanged` event
-
-Fired when a subscription's plan is changed. This will be triggered once the `PlanSubscription` model is saved. 
-Plan change is determine by comparing the original and current value of `plan_id`.
-
-## Config File
-
-You can configure what database tables, what models to use, list of positive words will use.
-
-Definitions:
-
-- **Positive Words**: Are used to tell if a particular feature is _enabled_. E.g., if the feature `listing_title_bold` 
-   has the value `Y` (_Y_ is one of the positive words) then, that means it's enabled.
-
-Take a look to the `config/plans.php` config file for more details.
 
 ## Changelog
 

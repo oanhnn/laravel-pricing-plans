@@ -28,20 +28,20 @@ class SubscriptionAbility
      * Determine if the feature is enabled and has
      * available uses.
      *
-     * @param int $featureId
+     * @param string $featureCode
      * @return bool
      */
-    public function canUse($featureId): bool
+    public function canUse(string $featureCode): bool
     {
         // Get features and usage
-        $featureValue = $this->value($featureId);
+        $featureValue = $this->value($featureCode);
 
         if (is_null($featureValue)) {
             return false;
         }
 
         // Match "boolean" type value
-        if ($this->enabled($featureId) === true) {
+        if ($this->enabled($featureCode) === true) {
             return true;
         }
 
@@ -53,21 +53,21 @@ class SubscriptionAbility
         }
 
         // Check for available uses
-        return $this->remainings($featureId) > 0;
+        return $this->remainings($featureCode) > 0;
     }
 
     /**
      * Get how many times the feature has been used.
      *
-     * @param int $featureId
+     * @param string $featureCode
      * @return int
      */
-    public function consumed($featureId)
+    public function consumed(string $featureCode): int
     {
         /** @var \Laravel\PricingPlans\Models\PlanSubscriptionUsage $usage */
         foreach ($this->subscription->usage as $usage) {
-            if ($usage->feature_id === $featureId && $usage->isExpired()) {
-                return $usage->used;
+            if ($usage->feature_code === $featureCode && $usage->isExpired()) {
+                return (int) $usage->used;
             }
         }
 
@@ -77,23 +77,23 @@ class SubscriptionAbility
     /**
      * Get the available uses.
      *
-     * @param int $featureId
+     * @param string $featureCode
      * @return int
      */
-    public function remainings($featureId)
+    public function remainings(string $featureCode): int
     {
-        return (int)$this->value($featureId) - $this->consumed($featureId);
+        return (int)$this->value($featureCode) - $this->consumed($featureCode);
     }
 
     /**
      * Check if subscription plan feature is enabled.
      *
-     * @param int $featureId
+     * @param string $featureCode
      * @return bool
      */
-    public function enabled($featureId)
+    public function enabled(string $featureCode): bool
     {
-        $featureValue = $this->value($featureId);
+        $featureValue = $this->value($featureCode);
 
         if (is_null($featureValue)) {
             return false;
@@ -111,15 +111,19 @@ class SubscriptionAbility
     /**
      * Get feature value.
      *
-     * @param int $featureId
+     * @param string$featureCode
      * @param  mixed $default
      * @return mixed
      */
-    public function value($featureId, $default = null)
+    public function value(string $featureCode, $default = null)
     {
+        if (!$this->subscription->plan->relationLoaded('features')) {
+            $this->subscription->plan->features()->getEager();
+        }
+
         /** @var \Laravel\PricingPlans\Models\Feature $feature */
         foreach ($this->subscription->plan->features as $feature) {
-            if ($featureId === $feature->id) {
+            if ($featureCode === $feature->code) {
                 return $feature->pivot->value;
             }
         }

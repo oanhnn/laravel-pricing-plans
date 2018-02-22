@@ -16,6 +16,7 @@ class PlanTest extends TestCase
         /** @var \Laravel\PricingPlans\Models\Plan $plan */
         $plan = Plan::create([
             'name' => 'Pro',
+            'code' => 'pro',
             'description' => 'Pro plan',
             'price' => 19.9,
             'interval_unit' => 'month',
@@ -26,6 +27,7 @@ class PlanTest extends TestCase
 
         $feature1 = Feature::create([
             'name' => 'Upload images',
+            'code' => 'upload-images',
             'description' => 'Can upload images in post',
             'interval_unit' => 'day',
             'interval_count' => 1,
@@ -34,6 +36,7 @@ class PlanTest extends TestCase
 
         $feature2 = Feature::create([
             'name' => 'Upload video',
+            'code' => 'upload-video',
             'description' => 'Can upload video in post',
             'interval_unit' => 'day',
             'interval_count' => 1,
@@ -42,6 +45,7 @@ class PlanTest extends TestCase
 
         $feature3 = Feature::create([
             'name' => 'Comment',
+            'code' => 'comment',
             'description' => 'Can comment on post',
             'sort_order' => 3,
         ]);
@@ -60,6 +64,7 @@ class PlanTest extends TestCase
         $plan->fresh();
 
         $this->assertEquals('Pro', $plan->name);
+        $this->assertEquals('pro', $plan->code);
         $this->assertEquals(3, $plan->features->count());
     }
 }

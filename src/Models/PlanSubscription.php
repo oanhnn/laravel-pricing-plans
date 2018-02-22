@@ -72,6 +72,11 @@ class PlanSubscription extends Model
     ];
 
     /**
+     * @var array
+     */
+    protected $with = ['plan'];
+
+    /**
      * Subscription Ability Manager instance.
      *
      * @var \Laravel\PricingPlans\SubscriptionAbility
@@ -250,8 +255,14 @@ class PlanSubscription extends Model
      */
     public function changePlan($plan)
     {
-        if (is_numeric($plan)) {
+        if (!($plan instanceof Plan)) {
+            // Try find by Plan ID
             $plan = App::make(Config::get('plans.models.Plan'))->find($plan);
+
+            if (!$plan) {
+                // Try find by Plan Code
+                $plan = App::make(Config::get('plans.models.Plan'))->findByCode($plan);
+            }
         }
 
         if (is_null($plan) || !($plan instanceof Plan)) {

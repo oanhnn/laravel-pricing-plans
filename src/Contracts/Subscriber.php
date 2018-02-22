@@ -18,10 +18,10 @@ interface Subscriber
      * Check if the user has a given subscription.
      *
      * @param  string $subscription Subscription name
-     * @param  int $planId
+     * @param  string|null $planCode
      * @return bool
      */
-    public function subscribed(string $subscription, $planId = null): bool;
+    public function subscribed(string $subscription, string $planCode = null): bool;
 
     /**
      * Subscribe user to a new plan.

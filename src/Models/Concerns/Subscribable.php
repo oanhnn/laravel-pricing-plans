@@ -2,6 +2,7 @@
 
 namespace Laravel\PricingPlans\Models\Concerns;
 
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Laravel\PricingPlans\Models\Plan;
 use Laravel\PricingPlans\SubscriptionBuilder;
@@ -50,18 +51,18 @@ trait Subscribable
      * Check if the user has a given subscription.
      *
      * @param  string $subscription Subscription name
-     * @param  int|null $planId
+     * @param  string|null $planCode
      * @return bool
      */
-    public function subscribed(string $subscription, $planId = null): bool
+    public function subscribed(string $subscription, string $planCode = null): bool
     {
-        $subscription = $this->subscription($subscription);
+        $planSubscription = $this->subscription($subscription);
 
-        if (is_null($subscription)) {
+        if (is_null($planSubscription)) {
             return false;
         }
 
-        if (is_null($planId) || $planId == $subscription->plan_id) {
+        if (is_null($planCode) || $planCode == $planSubscription->plan->code) {
             return $subscription->isActive();
         }
 

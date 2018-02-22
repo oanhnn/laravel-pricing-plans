@@ -3,7 +3,6 @@
 namespace Laravel\PricingPlans\Models;
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Support\Facades\Config;
 use Laravel\PricingPlans\Models\Concerns\BelongsToPlanModel;
 
 /**
@@ -40,18 +39,6 @@ class PlanFeature extends Pivot
         'created_at',
         'updated_at',
     ];
-
-    /**
-     * Plan constructor.
-     *
-     * @param array $attributes
-     */
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-
-        $this->setTable(Config::get('plans.tables.plan_features'));
-    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

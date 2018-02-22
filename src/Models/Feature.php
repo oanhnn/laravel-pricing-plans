@@ -32,6 +32,7 @@ class Feature extends Model
      */
     protected $fillable = [
         'name',
+        'code',
         'description',
         'interval_unit',
         'interval_count',
@@ -67,7 +68,7 @@ class Feature extends Model
     {
         return $this->belongsToMany(
             Config::get('plans.models.Plan'),
-            Config::get('plans.tables.plans'),
+            Config::get('plans.tables.plan_features'),
             'feature_id',
             'plan_id'
         )->using(Config::get('plans.models.PlanFeature'));

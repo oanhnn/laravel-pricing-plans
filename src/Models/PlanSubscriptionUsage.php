@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Config;
  * @package Laravel\PricingPlans\Models
  * @property int $id
  * @property int $subscription_id
- * @property int $feature_id
+ * @property string $feature_code
  * @property int $used
  * @property \Carbon\Carbon $valid_until
  * @property \Carbon\Carbon $created_at
@@ -61,8 +61,8 @@ class PlanSubscriptionUsage extends Model
     {
         return $this->belongsTo(
             Config::get('plans.models.Feature'),
-            'feature_id',
-            'id'
+            'feature_code',
+            'code'
         );
     }
 
@@ -84,12 +84,12 @@ class PlanSubscriptionUsage extends Model
      * Scope by feature code.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int|\Laravel\PricingPlans\Models\Feature $feature
+     * @param string|\Laravel\PricingPlans\Models\Feature $feature
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeByFeature($query, $feature)
     {
-        return $query->where('feature_id', $feature instanceof Feature ? $feature->id : $feature);
+        return $query->where('feature_code', $feature instanceof Feature ? $feature->code : $feature);
     }
 
     /**

@@ -17,6 +17,7 @@ class FeatureTest extends TestCase
         /** @var \Laravel\PricingPlans\Models\Feature $feature1 */
         $feature1 = Feature::create([
             'name' => 'Upload images',
+            'code' => 'upload-images',
             'description' => 'Can upload images in post',
             'interval_unit' => 'day',
             'interval_count' => 1,
@@ -26,6 +27,7 @@ class FeatureTest extends TestCase
         /** @var \Laravel\PricingPlans\Models\Feature $feature2 */
         $feature2 = Feature::create([
             'name' => 'Upload video',
+            'code' => 'upload-video',
             'description' => 'Can upload video in post',
             'interval_unit' => 'day',
             'interval_count' => 1,
@@ -35,6 +37,7 @@ class FeatureTest extends TestCase
         /** @var \Laravel\PricingPlans\Models\Feature $feature3 */
         $feature3 = Feature::create([
             'name' => 'Comment',
+            'code' => 'comment',
             'description' => 'Can comment on post',
             'sort_order' => 3,
         ]);
@@ -44,6 +47,7 @@ class FeatureTest extends TestCase
         $feature3->fresh();
 
         $this->assertEquals('Upload images', $feature1->name);
+        $this->assertEquals('upload-images', $feature1->code);
         $this->assertTrue($feature2->isResettable());
         $this->assertFalse($feature3->isResettable());
     }
@@ -59,6 +63,7 @@ class FeatureTest extends TestCase
         /** @var \Laravel\PricingPlans\Models\Feature $feature1 */
         $feature1 = Feature::create([
             'name' => 'Upload images',
+            'code' => 'upload-images',
             'description' => 'Can upload images in post',
             'interval_unit' => 'day',
             'interval_count' => 1,
