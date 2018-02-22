@@ -56,7 +56,7 @@ Easy provide pricing plans for Your Laravel 5.4+ Application.
 
 - [ ] Caching some select query
 - [ ] Add unit test scripts
-- [ ] Make better document
+- [ ] Make better documents
 
 ## Requirements
 
@@ -98,7 +98,7 @@ $ php artisan vendor:publish --provider="Laravel\PricingPlans\PricingPlansServic
 Then run migrations:
 
 ```bash
-    php artisan migrate
+$ php artisan migrate
 ```
 
 ### Contract and Traits

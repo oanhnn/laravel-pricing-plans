@@ -27,20 +27,15 @@
   },
   "require": {
     "php": ">=7.0",
-    "illuminate/cache": "5.4.*|5.5.*",
-    "illuminate/container": "5.4.*|5.5.*",
-    "illuminate/contracts": "5.4.*|5.5.*",
-    "illuminate/database": "5.4.*|5.5.*",
-    "illuminate/events": "5.4.*|5.5.*",
-    "illuminate/queue": "5.4.*|5.5.*",
-    "illuminate/support": "5.4.*|5.5.*",
+    "illuminate/database": "~5.4",
+    "illuminate/support": "~5.4",
     "nesbot/carbon": "~1.21"
   },
   "require-dev": {
     "fzaninotto/faker": "~1.4",
     "mockery/mockery": "~0.9",
-    "orchestra/database": "^3.4",
-    "orchestra/testbench": "^3.4",
+    "orchestra/database": "~3.4",
+    "orchestra/testbench": "~3.4",
     "phpunit/phpunit": "~6.1",
     "squizlabs/php_codesniffer": "^3.0"
   },

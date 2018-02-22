@@ -2,13 +2,10 @@
 
 namespace Laravel\PricingPlans\Events;
 
-use Illuminate\Queue\SerializesModels;
 use Laravel\PricingPlans\Models\PlanSubscription;
 
 class SubscriptionPlanChanged
 {
-    use SerializesModels;
-
     /**
      * @var PlanSubscription
      */
