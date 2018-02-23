@@ -5,6 +5,8 @@ language: php
 matrix:
   include:
     - php: 7.0
+      env: ILLUMINATE_VERSION=5.4.* COMPOSER_ARGS="--prefer-lowest"
+    - php: 7.0
       env: ILLUMINATE_VERSION=5.4.*
     - php: 7.1
       env: ILLUMINATE_VERSION=5.4.*
@@ -13,13 +15,13 @@ matrix:
     - php: 7.0
       env: ILLUMINATE_VERSION=5.5.*
     - php: 7.1
-      env: ILLUMINATE_VERSION=5.5.*
+      env: ILLUMINATE_VERSION=5.5.* ANALYSIS=true
     - php: 7.2
       env: ILLUMINATE_VERSION=5.5.*
-    - php: 7.1
-      env: ILLUMINATE_VERSION=5.6.*
-    - php: 7.2
-      env: ILLUMINATE_VERSION=5.6.*
+    #- php: 7.1
+    #  env: ILLUMINATE_VERSION=5.6.*
+    #- php: 7.2
+    #  env: ILLUMINATE_VERSION=5.6.*
 
 before_install:
   - composer self-update
@@ -27,12 +29,13 @@ before_install:
   - composer require "illuminate/support:${ILLUMINATE_VERSION}" --no-update
 
 install:
-  - composer update --no-interaction --prefer-dist
-  - composer require satooshi/php-coveralls:~1.0
+  - composer update $COMPOSER_ARGS --no-interaction --prefer-dist
 
 script:
-  - php vendor/bin/phpcs
-  - php vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+  - if [[ "${ANALYSIS}" == 'true' ]]; then php vendor/bin/phpcs ; fi
+  - if [[ "${ANALYSIS}" == 'true' ]]; then php vendor/bin/phpunit --coverage-clover=clover.xml ; fi
+  - if [[ "${ANALYSIS}" != 'true' ]]; then php vendor/bin/phpunit ; fi
 
 after_script:
-  - php vendor/bin/coveralls -v
+  - if [[ "${ANALYSIS}" == 'true' ]]; then composer require satooshi/php-coveralls:~1.0 ; fi
+  - if [[ "${ANALYSIS}" == 'true' ]]; then php vendor/bin/coveralls --coverage_clover=clover.xml -v ; fi

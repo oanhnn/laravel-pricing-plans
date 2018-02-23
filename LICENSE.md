@@ -1,5 +1,6 @@
 The MIT License (MIT)
 
+Copyright © 2016-2017 Gerardo Baez <g@gerardobaez.com>
 Copyright © 2017-2018 Oanh Nguyen <oanhnn.bk@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

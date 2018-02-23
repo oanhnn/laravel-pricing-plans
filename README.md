@@ -440,7 +440,11 @@ using the issue tracker.
 
 ## Credits
 
+I forked and recreated this project from [gerardojbaez/laraplans](https://github.com/gerardojbaez/laraplans) project in mid-2017.
+Thank [Gerardo Baez](https://github.com/gerardojbaez)
+
 - [Oanh Nguyen](https://github.com/oanhnn)
+- [Gerardo Baez](https://github.com/gerardojbaez)
 - [All Contributors](../../contributors)
 
 ## License
