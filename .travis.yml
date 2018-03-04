@@ -2,40 +2,35 @@ dist: trusty
 sudo: false
 language: php
 
+php:
+  - 7.0
+  - 7.1
+  - 7.2
+
+env:
+  - ILLUMINATE_VERSION=5.4.*
+  - ILLUMINATE_VERSION=5.5.*
+  - ILLUMINATE_VERSION=5.6.*
+
 matrix:
-  include:
-    - php: 7.0
-      env: ILLUMINATE_VERSION=5.4.*
-    - php: 7.1
-      env: ILLUMINATE_VERSION=5.4.*
-    - php: 7.2
-      env: ILLUMINATE_VERSION=5.4.*
-    - php: 7.0
-      env: ILLUMINATE_VERSION=5.5.*
-    - php: 7.1
-      env: ILLUMINATE_VERSION=5.5.* ANALYSIS=true
-    - php: 7.2
-      env: ILLUMINATE_VERSION=5.5.*
-    - php: 7.1
-      env: ILLUMINATE_VERSION=5.6.*
-    - php: 7.2
-      env: ILLUMINATE_VERSION=5.6.*
-  allow_failures:
-    - env: ILLUMINATE_VERSION=5.6.*
+  fast_finish: true
+
+cache:
+  directories:
+    - $HOME/.composer/cache
 
 before_install:
-  - composer self-update
-  - composer require "illuminate/database:${ILLUMINATE_VERSION}" --no-update
-  - composer require "illuminate/support:${ILLUMINATE_VERSION}" --no-update
+  - travis_retry composer self-update
+  - travis_retry composer require "illuminate/database:${ILLUMINATE_VERSION}" --no-update
+  - travis_retry composer require "illuminate/support:${ILLUMINATE_VERSION}" --no-update
 
 install:
-  - composer update $COMPOSER_ARGS --no-interaction --prefer-dist
+  - travis_retry composer update --no-interaction --prefer-dist $COMPOSER_ARGS
 
 script:
-  - if [[ "${ANALYSIS}" == 'true' ]]; then php vendor/bin/phpcs ; fi
-  - if [[ "${ANALYSIS}" == 'true' ]]; then php vendor/bin/phpunit --coverage-clover=clover.xml ; fi
-  - if [[ "${ANALYSIS}" != 'true' ]]; then php vendor/bin/phpunit ; fi
+  - php vendor/bin/phpcs
+  - php vendor/bin/phpunit --coverage-clover=clover.xml
 
-after_script:
-  - if [[ "${ANALYSIS}" == 'true' ]]; then composer require satooshi/php-coveralls:~1.0 ; fi
-  - if [[ "${ANALYSIS}" == 'true' ]]; then php vendor/bin/coveralls --coverage_clover=clover.xml -v ; fi
+after_success:
+  - travis_retry composer require satooshi/php-coveralls:~1.0
+  - travis_retry php vendor/bin/coveralls --coverage_clover=clover.xml -v

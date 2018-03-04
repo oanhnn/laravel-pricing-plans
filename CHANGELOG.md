@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Nothing
 
 ### Changed
-- Nothing
+- Update TravisCI, remove allow failure on Laravel 5.6.* 
 
 ### Deprecated
 - Nothing
@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 - Nothing
 
+
 ## [0.2.1] - 2018-02-26
 ### Added
 - Add link to origin repository in README
@@ -35,8 +36,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Fixed TravisCI build
 
-### Security
-- Nothing
 
 ## [0.2.0] - 2018-02-22
 ### Added
