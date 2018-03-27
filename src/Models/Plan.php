@@ -109,7 +109,6 @@ class Plan extends Model
     {
         return $this->hasMany(
             Config::get('plans.models.PlanSubscription'),
-            Config::get('plans.tables.plan_subscriptions'),
             'plan_id',
             'id'
         );
