@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 
 ## [Unreleased] - YYYY-MM-DD
+
 ### Added
 - Nothing
 
@@ -23,6 +24,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Security
 - Nothing
+
+
+## [0.2.3] - 2018-03-27
+
+### Fixed
+- Fix incorrect relationship in Feature and Plan models. ([51ff5f3](https://github.com/oanhnn/laravel-pricing-plans/commit/51ff5f3644a318b999cc47491baa5d7c9d36d7ad))
+  Thank @cimon77
 
 
 ## [0.2.2] - 2018-03-27
@@ -64,7 +72,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added some tests
 
 
-[Unreleased]: https://github.com/oanhnn/laravel-pricing-plans/compare/v0.2.2...develop
+[Unreleased]: https://github.com/oanhnn/laravel-pricing-plans/compare/v0.2.3...develop
+[0.2.3]:      https://github.com/oanhnn/laravel-pricing-plans/compare/v0.2.2...v0.2.3
 [0.2.2]:      https://github.com/oanhnn/laravel-pricing-plans/compare/v0.2.1...v0.2.2
 [0.2.1]:      https://github.com/oanhnn/laravel-pricing-plans/compare/v0.2.0...v0.2.1
 [0.2.0]:      https://github.com/oanhnn/laravel-pricing-plans/compare/v0.1.0...v0.2.0
