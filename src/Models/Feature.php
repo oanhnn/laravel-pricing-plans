@@ -86,8 +86,8 @@ class Feature extends Model
         return $this->hasMany(
             Config::get('plans.models.PlanSubscriptionUsage'),
             Config::get('plans.tables.plan_subscription_usages'),
-            'feature_id',
-            'id'
+            'feature_code',
+            'code'
         );
     }
 }
