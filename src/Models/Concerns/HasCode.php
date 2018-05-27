@@ -11,7 +11,7 @@ trait HasCode
      * @param string $code
      * @return Builder
      */
-    public function findByCode(Builder $query, string $code)
+    public function scopeCode(Builder $query, string $code)
     {
         return $query->where('code', $code);
     }
