@@ -264,7 +264,7 @@ use Illuminate\Support\Facades\Auth;
 use Laravel\PricingPlans\Models\Plan;
 
 $user = Auth::user();
-$plan = Plan::findByCode(Plan::PLAN_PRO);
+$plan = Plan::code(Plan::PLAN_PRO)->firstOrFail();
 
 $user->newSubscription('main', $plan)->create();
 ```

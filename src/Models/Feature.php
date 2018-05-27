@@ -4,6 +4,7 @@ namespace Laravel\PricingPlans\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
+use Laravel\PricingPlans\Models\Concerns\HasCode;
 use Laravel\PricingPlans\Models\Concerns\Resettable;
 
 /**
@@ -18,7 +19,7 @@ use Laravel\PricingPlans\Models\Concerns\Resettable;
  */
 class Feature extends Model
 {
-    use Resettable;
+    use Resettable, HasCode;
 
     /**
      * @var string

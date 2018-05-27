@@ -5,6 +5,7 @@ namespace Laravel\PricingPlans\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Lang;
+use Laravel\PricingPlans\Models\Concerns\HasCode;
 use Laravel\PricingPlans\Models\Concerns\Resettable;
 use Laravel\PricingPlans\Period;
 
@@ -14,17 +15,17 @@ use Laravel\PricingPlans\Period;
  * @property int $id
  * @property string $name
  * @property string $description
- * @property float  $price
+ * @property float $price
  * @property string $interval_unit
- * @property int    $interval_count
- * @property int    $trial_period_days
+ * @property int $interval_count
+ * @property int $trial_period_days
  * @property int $sort_order
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  */
 class Plan extends Model
 {
-    use Resettable;
+    use Resettable, HasCode;
 
     /**
      * The attributes that are mass assignable.
@@ -92,12 +93,16 @@ class Plan extends Model
      */
     public function features()
     {
-        return $this->belongsToMany(
-            Config::get('plans.models.Feature'),
-            Config::get('plans.tables.plan_features'),
-            'plan_id',
-            'feature_id'
-        )->using(Config::get('plans.models.PlanFeature'));
+        return $this
+            ->belongsToMany(
+                Config::get('plans.models.Feature'),
+                Config::get('plans.tables.plan_features'),
+                'plan_id',
+                'feature_id'
+            )
+            ->using(Config::get('plans.models.PlanFeature'))
+            ->withPivot(['value', 'note'])
+            ->orderBy('sort_order');
     }
 
     /**
