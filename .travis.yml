@@ -33,8 +33,8 @@ install:
 
 script:
   - php vendor/bin/phpcs
-  - php vendor/bin/phpunit --coverage-clover=clover.xml
+  - php vendor/bin/phpunit --coverage-clover=build/logs/clover.xml
 
 after_success:
-  - travis_retry composer require satooshi/php-coveralls:~1.0
-  - travis_retry php vendor/bin/coveralls --coverage_clover=clover.xml -v
+  - travis_retry composer require php-coveralls/php-coveralls
+  - travis_retry php vendor/bin/php-coveralls --coverage_clover=build/logs/clover.xml -v
