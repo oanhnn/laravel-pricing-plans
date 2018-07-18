@@ -123,6 +123,59 @@ class User extends Authenticatable implements Subscriber
     // ...
 }
 ```
+
+If you get an error, consider that you implements the interface `Subscriber` - You must **implement** the given methods in your model like:
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\PricingPlans\Contracts\Subscriber;
+use Laravel\PricingPlans\Models\Concerns\Subscribable;
+
+class User extends Authenticatable implements Subscriber
+{
+    use Subscribable;
+    // ...
+    
+    /**
+     * Get a subscription by name.
+     *
+     * @param  string $name Subscription name
+     * @return \Laravel\PricingPlans\Models\PlanSubscription|null
+     */
+    public function subscription(string $name = 'default');
+
+    /**
+     * Check if the user has a given subscription.
+     *
+     * @param  string $subscription Subscription name
+     * @param  string|null $planCode
+     * @return bool
+     */
+    public function subscribed(string $subscription, string $planCode = null): bool;
+
+    /**
+     * Subscribe user to a new plan.
+     *
+     * @param string $subscription Subscription name
+     * @param \Laravel\PricingPlans\Models\Plan $plan
+     * @return \Laravel\PricingPlans\SubscriptionBuilder
+     */
+    public function newSubscription(string $subscription, Plan $plan);
+
+    /**
+     * Get subscription usage manager instance.
+     *
+     * @param string $subscription Subscription name
+     * @return \Laravel\PricingPlans\SubscriptionUsageManager
+     */
+    public function subscriptionUsage(string $subscription);
+}
+```
+
 ## Config File
 
 You can configure what database tables, what models to use, list of positive words will use.
