@@ -101,7 +101,7 @@ class PlanSubscription extends Model
 
         static::saved(function ($model) {
             /** @var PlanSubscription $model */
-            if ($model->getOriginal('plan_id') !== $model->plan_id) {
+            if ($model->getOriginal('plan_id') && $model->getOriginal('plan_id') !== $model->plan_id) {
                 Event::dispatch(new SubscriptionPlanChanged($model));
             }
         });
