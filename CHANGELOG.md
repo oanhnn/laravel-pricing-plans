@@ -28,6 +28,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 
 
+## [0.3.1] - 2018-07-20
+
+### Fixed
+- Fix `Subscribable` trait with `Subscriber` interface. ([304f7b6](https://github.com/oanhnn/laravel-pricing-plans/tree/304f7b60db149b52e76f847a7913349f113bb602))
+- Fix TravisCI send coverage. ([b329094](https://github.com/oanhnn/laravel-pricing-plans/commit/b32909481d2116fc51793567f78acaec20cf9f98))
+
+
+
 ## [0.3.0] - 2018-05-27
 
 ### Added
@@ -89,7 +97,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 
 
-[Unreleased]: https://github.com/oanhnn/laravel-pricing-plans/compare/v0.3.0...develop
+[Unreleased]: https://github.com/oanhnn/laravel-pricing-plans/compare/v0.3.1...develop
+[0.3.1]:      https://github.com/oanhnn/laravel-pricing-plans/compare/v0.3.0...v0.3.1
 [0.3.0]:      https://github.com/oanhnn/laravel-pricing-plans/compare/v0.2.3...v0.3.0
 [0.2.3]:      https://github.com/oanhnn/laravel-pricing-plans/compare/v0.2.2...v0.2.3
 [0.2.2]:      https://github.com/oanhnn/laravel-pricing-plans/compare/v0.2.1...v0.2.2
