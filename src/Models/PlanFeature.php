@@ -47,7 +47,6 @@ class PlanFeature extends Pivot
     {
         return $this->belongsTo(
             Config::get('plans.models.Feature'),
-            Config::get('plans.tables.features'),
             'feature_id',
             'id'
         );

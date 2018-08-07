@@ -26,7 +26,8 @@ class PlanSubscriptionUsage extends Model
      */
     protected $fillable = [
         'valid_until',
-        'used'
+        'used',
+        'feature_code',
     ];
 
     /**

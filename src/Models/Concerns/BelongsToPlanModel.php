@@ -15,7 +15,6 @@ trait BelongsToPlanModel
     {
         return $this->belongsTo(
             Config::get('plans.models.Plan'),
-            Config::get('plans.tables.plans'),
             'plan_id',
             'id'
         );

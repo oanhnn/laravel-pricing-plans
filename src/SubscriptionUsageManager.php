@@ -38,7 +38,7 @@ class SubscriptionUsageManager
     public function record(string $featureCode, $uses = 1, $incremental = true)
     {
         /** @var \Laravel\PricingPlans\Models\Feature $feature */
-        $feature = Feature::findByCode($featureCode);
+        $feature = Feature::code($featureCode)->first();
 
         $usage = $this->subscription->usage()->firstOrNew([
             'feature_code' => $feature->code,
