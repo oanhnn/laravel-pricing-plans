@@ -66,7 +66,7 @@ class SubscriptionAbility
     {
         /** @var \Laravel\PricingPlans\Models\PlanSubscriptionUsage $usage */
         foreach ($this->subscription->usage as $usage) {
-            if ($usage->feature_code === $featureCode && $usage->isExpired()) {
+            if ($usage->feature_code === $featureCode && !$usage->isExpired()) {
                 return (int) $usage->used;
             }
         }
