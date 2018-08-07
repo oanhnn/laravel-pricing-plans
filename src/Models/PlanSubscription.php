@@ -51,6 +51,7 @@ class PlanSubscription extends Model
      */
     protected $fillable = [
         'name',
+        'plan_id',
         'trial_ends_at',
         'starts_at',
         'ends_at',
