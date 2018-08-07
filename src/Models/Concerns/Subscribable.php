@@ -87,7 +87,7 @@ trait Subscribable
      * @param  string $subscription Subscription name
      * @return \Laravel\PricingPlans\SubscriptionUsageManager
      */
-    public function subscriptionUsage(string $subscription)
+    public function subscriptionUsage(string $subscription  = 'default')
     {
         return new SubscriptionUsageManager($this->subscription($subscription));
     }
