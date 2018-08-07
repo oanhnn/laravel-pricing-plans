@@ -28,6 +28,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 
 
+## [0.3.2] - 2018-08-07
+
+### Fixed
+- Fix #3 : Incorrect `belongTo` parameters in `BelongsToPlanModel` Trait. ([32ee324](https://github.com/oanhnn/laravel-pricing-plans/commit/32ee3243907feffbe80f3ae0a2f226ce3ca1f5df))
+- Fix #8 : Missing `findByCode` method. ([32ee324](https://github.com/oanhnn/laravel-pricing-plans/commit/32ee3243907feffbe80f3ae0a2f226ce3ca1f5df))
+- Fix : `SubscriptionAbility::consumed()` method return incorrect value. ([32ee324](https://github.com/oanhnn/laravel-pricing-plans/commit/32ee3243907feffbe80f3ae0a2f226ce3ca1f5df))
+
+
+
 ## [0.3.1] - 2018-07-20
 
 ### Fixed
@@ -97,7 +106,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 
 
-[Unreleased]: https://github.com/oanhnn/laravel-pricing-plans/compare/v0.3.1...develop
+[Unreleased]: https://github.com/oanhnn/laravel-pricing-plans/compare/v0.3.2...develop
+[0.3.2]:      https://github.com/oanhnn/laravel-pricing-plans/compare/v0.3.1...v0.3.2
 [0.3.1]:      https://github.com/oanhnn/laravel-pricing-plans/compare/v0.3.0...v0.3.1
 [0.3.0]:      https://github.com/oanhnn/laravel-pricing-plans/compare/v0.2.3...v0.3.0
 [0.2.3]:      https://github.com/oanhnn/laravel-pricing-plans/compare/v0.2.2...v0.2.3
