@@ -28,20 +28,27 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 
 
+## [0.3.3] - 2018-08-09
+
+### Fixed
+- Fixed #10: Missing `plan_id` when create new subscription. Thank @Georde ([7af238e](https://github.com/oanhnn/laravel-pricing-plans/commit/7af238ebc0368e2170643385ece0e1aa9903bcb4))
+
+
+
 ## [0.3.2] - 2018-08-07
 
 ### Fixed
-- Fix #3 : Incorrect `belongTo` parameters in `BelongsToPlanModel` Trait. ([32ee324](https://github.com/oanhnn/laravel-pricing-plans/commit/32ee3243907feffbe80f3ae0a2f226ce3ca1f5df))
-- Fix #8 : Missing `findByCode` method. ([32ee324](https://github.com/oanhnn/laravel-pricing-plans/commit/32ee3243907feffbe80f3ae0a2f226ce3ca1f5df))
-- Fix : `SubscriptionAbility::consumed()` method return incorrect value. ([32ee324](https://github.com/oanhnn/laravel-pricing-plans/commit/32ee3243907feffbe80f3ae0a2f226ce3ca1f5df))
+- Fixed #3 : Incorrect `belongTo` parameters in `BelongsToPlanModel` Trait. ([32ee324](https://github.com/oanhnn/laravel-pricing-plans/commit/32ee3243907feffbe80f3ae0a2f226ce3ca1f5df))
+- Fixed #8 : Missing `findByCode` method. ([32ee324](https://github.com/oanhnn/laravel-pricing-plans/commit/32ee3243907feffbe80f3ae0a2f226ce3ca1f5df))
+- Fixed: `SubscriptionAbility::consumed()` method return incorrect value. ([32ee324](https://github.com/oanhnn/laravel-pricing-plans/commit/32ee3243907feffbe80f3ae0a2f226ce3ca1f5df))
 
 
 
 ## [0.3.1] - 2018-07-20
 
 ### Fixed
-- Fix `Subscribable` trait with `Subscriber` interface. ([304f7b6](https://github.com/oanhnn/laravel-pricing-plans/tree/304f7b60db149b52e76f847a7913349f113bb602))
-- Fix TravisCI send coverage. ([b329094](https://github.com/oanhnn/laravel-pricing-plans/commit/b32909481d2116fc51793567f78acaec20cf9f98))
+- Fixed: `Subscribable` trait with `Subscriber` interface. ([304f7b6](https://github.com/oanhnn/laravel-pricing-plans/tree/304f7b60db149b52e76f847a7913349f113bb602))
+- Fixed: TravisCI send coverage. ([b329094](https://github.com/oanhnn/laravel-pricing-plans/commit/b32909481d2116fc51793567f78acaec20cf9f98))
 
 
 
@@ -51,14 +58,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add local scope `code` for `Plan` and `Feature` model
 
 ### Fixed
-- Fixed mission `value` and `node` attributes of `$plan->features->pivot`
+- Fixed: Missing `value` and `node` attributes of `$plan->features->pivot`
 
 
 
 ## [0.2.3] - 2018-03-27
 
 ### Fixed
-- Fix incorrect relationship in Feature and Plan models. ([51ff5f3](https://github.com/oanhnn/laravel-pricing-plans/commit/51ff5f3644a318b999cc47491baa5d7c9d36d7ad))
+- Fixed: incorrect relationship in Feature and Plan models. ([51ff5f3](https://github.com/oanhnn/laravel-pricing-plans/commit/51ff5f3644a318b999cc47491baa5d7c9d36d7ad))
   Thank @cimon77
 
 
@@ -69,7 +76,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update TravisCI, remove allow failure on Laravel 5.6.* ([d7f934f](https://github.com/oanhnn/laravel-pricing-plans/commit/d7f934f49637460d9978fac1d803b6fae095e6d4))
 
 ### Fixed
-- Fix incorrect relationship in Feature model. ([7b26b76](https://github.com/oanhnn/laravel-pricing-plans/commit/7b26b7619a34af2e9a81921d50e343f552f081c4))
+- Fixed: Incorrect relationship in Feature model. ([7b26b76](https://github.com/oanhnn/laravel-pricing-plans/commit/7b26b7619a34af2e9a81921d50e343f552f081c4))
   Thank @cimon77
 
 
@@ -83,7 +90,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update LICENSE ([afe05ce](https://github.com/oanhnn/laravel-pricing-plans/commit/afe05cee6fd1c0b1e9f5fbfe672f48dd2cbb4967))
 
 ### Fixed
-- Fixed TravisCI build ([358dcee](https://github.com/oanhnn/laravel-pricing-plans/commit/358dcee6afbc99b75da967fcd25f4656d3dfa16b))
+- Fixed: TravisCI build ([358dcee](https://github.com/oanhnn/laravel-pricing-plans/commit/358dcee6afbc99b75da967fcd25f4656d3dfa16b))
 
 
 
@@ -106,7 +113,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 
 
-[Unreleased]: https://github.com/oanhnn/laravel-pricing-plans/compare/v0.3.2...develop
+[Unreleased]: https://github.com/oanhnn/laravel-pricing-plans/compare/v0.3.3...develop
+[0.3.3]:      https://github.com/oanhnn/laravel-pricing-plans/compare/v0.3.2...v0.3.3
 [0.3.2]:      https://github.com/oanhnn/laravel-pricing-plans/compare/v0.3.1...v0.3.2
 [0.3.1]:      https://github.com/oanhnn/laravel-pricing-plans/compare/v0.3.0...v0.3.1
 [0.3.0]:      https://github.com/oanhnn/laravel-pricing-plans/compare/v0.2.3...v0.3.0
