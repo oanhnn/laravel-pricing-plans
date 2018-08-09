@@ -54,7 +54,8 @@ class PlanSubscription extends Model
         'trial_ends_at',
         'starts_at',
         'ends_at',
-        'canceled_at'
+        'canceled_at',
+        'plan_id',
     ];
 
     /**
