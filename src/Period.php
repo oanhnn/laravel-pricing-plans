@@ -161,7 +161,7 @@ class Period
         $intervals = [];
 
         foreach (array_keys(self::$intervalMapping) as $interval) {
-            $intervals[$interval] = Lang::trans('plans::messages.' . $interval);
+            $intervals[$interval] = Lang::get('plans::messages.' . $interval);
         }
 
         return $intervals;

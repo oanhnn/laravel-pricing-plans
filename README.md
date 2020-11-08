@@ -5,7 +5,7 @@
 [![Latest Version](https://img.shields.io/github/release/oanhnn/laravel-pricing-plans.svg?style=flat-square)](https://github.com/oanhnn/laravel-pricing-plans/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
-Easy provide pricing plans for Your Laravel 5.4+ Application.
+Easy provide pricing plans for Your Laravel 8.4+ Application.
 
 <!-- MarkdownTOC depth="2" autolink="true" bracket="round" -->
 

@@ -17,17 +17,18 @@ class TestCase extends Testbench
      *
      * @throws \Exception
      */
-    public function setUp()
+    protected function setUp():void
     {
         parent::setUp();
 
         // Run Laravel migrations
+        $this->loadMigrationsFrom(dirname(__DIR__) . '/resources/migrations');
         $this->loadLaravelMigrations('testbench');
 
         // Run package migrations
         $this->loadMigrationsFrom([
             '--database' => 'testbench',
-            '--realpath' => realpath(__DIR__ . '/../resources/migrations'),
+            '--realpath' => true,//realpath(__DIR__ . '/../resources/migrations'),
         ]);
     }
 
