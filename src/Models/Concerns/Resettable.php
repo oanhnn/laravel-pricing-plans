@@ -24,7 +24,7 @@ trait Resettable
      *
      * @return string
      */
-    public function getIntervalDescriptionAttribute()
+    public function getIntervalDescriptionAttribute(): string
     {
         return Lang::choice('plans::messages.interval_description.' . $this->interval_unit, $this->interval_count);
     }
@@ -41,7 +41,7 @@ trait Resettable
      * @param string|null|int|\DateTime $startedAt
      * @return \Carbon\Carbon
      */
-    public function getResetTime($startedAt = null)
+    public function getResetTime($startedAt = null): \Carbon\Carbon
     {
         return (new Period($this->interval_unit, $this->interval_count, $startedAt))->getEndAt();
     }

@@ -14,7 +14,7 @@ class SubscriptionPlanChanged
     /**
      * Create a new event instance.
      *
-     * @param  \Laravel\PricingPlans\Models\PlanSubscription $subscription
+     * @param PlanSubscription $subscription
      */
     public function __construct(PlanSubscription $subscription)
     {
@@ -24,7 +24,7 @@ class SubscriptionPlanChanged
     /**
      * @return PlanSubscription
      */
-    public function getSubscription()
+    public function getSubscription(): PlanSubscription
     {
         return $this->subscription;
     }
