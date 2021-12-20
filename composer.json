@@ -1,5 +1,5 @@
 {
-  "name": "oanhnn/laravel-pricing-plans",
+  "name": "olubunmitosin/laravel-pricing-plans",
   "type": "library",
   "description": "A package provide pricing plans for Laravel.",
   "keywords": [
@@ -9,15 +9,19 @@
     "pricing"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/oanhnn/laravel-pricing-plans",
+  "homepage": "https://github.com/olubunmitosin/laravel-pricing-plans",
   "support": {
-    "issues": "https://github.com/oanhnn/laravel-pricing-plans/issues",
-    "source": "https://github.com/oanhnn/laravel-pricing-plans"
+    "issues": "https://github.com/olubunmitosin/laravel-pricing-plans/issues",
+    "source": "https://github.com/olubunmitosin/laravel-pricing-plans"
   },
   "authors": [
     {
       "name": "Oanh Nguyen",
       "email": "oanhnn.bk@gmail.com"
+    },
+    {
+      "name": "Olubunmi Tosin",
+      "email": "vickkycodegenius@gmail.com"
     }
   ],
   "autoload": {
@@ -26,17 +30,17 @@
     }
   },
   "require": {
-    "php": ">=7.0",
-    "illuminate/database": "~5.4",
-    "illuminate/support": "~5.4",
-    "nesbot/carbon": "~1.21"
+    "php": "^7.3|^8.0",
+    "illuminate/database": "^8.0",
+    "illuminate/support": "^8.0",
+    "nesbot/carbon": "^2.5"
   },
   "require-dev": {
-    "fzaninotto/faker": "^1.4",
-    "mockery/mockery": "^0.9",
-    "orchestra/database": "^3.4",
-    "orchestra/testbench": "^3.4",
-    "phpunit/phpunit": "~6.1|~7.0",
+    "fakerphp/faker": "^1.9.1",
+    "mockery/mockery": "^1.4.2",
+    "orchestra/database": "^6.0",
+    "orchestra/testbench": "^6.23",
+    "phpunit/phpunit": "^9.3.3",
     "squizlabs/php_codesniffer": "^3.0"
   },
   "scripts": {

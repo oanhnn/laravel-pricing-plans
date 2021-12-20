@@ -14,7 +14,7 @@ class SubscriptionCanceled
     /**
      * Create a new event instance.
      *
-     * @param  \Laravel\PricingPlans\Models\PlanSubscription $subscription
+     * @param PlanSubscription $subscription
      */
     public function __construct(PlanSubscription $subscription)
     {

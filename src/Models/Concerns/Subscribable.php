@@ -2,9 +2,12 @@
 
 namespace Laravel\PricingPlans\Models\Concerns;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Laravel\PricingPlans\Models\Plan;
+use Laravel\PricingPlans\Models\PlanSubscription;
 use Laravel\PricingPlans\SubscriptionBuilder;
 use Laravel\PricingPlans\SubscriptionUsageManager;
 
@@ -13,9 +16,9 @@ trait Subscribable
     /**
      * Get user plan subscription.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
-    public function subscriptions()
+    public function subscriptions(): MorphMany
     {
         return $this->morphMany(
             Config::get('plans.models.PlanSubscription'),
@@ -27,7 +30,7 @@ trait Subscribable
      * Get a subscription by name.
      *
      * @param  string $name Subscription name
-     * @return \Laravel\PricingPlans\Models\PlanSubscription|null
+     * @return Model|MorphMany|PlanSubscription|object|null
      */
     public function subscription(string $name = 'default')
     {
@@ -73,8 +76,8 @@ trait Subscribable
      * Subscribe user to a new plan.
      *
      * @param string $subscription Subscription name
-     * @param \Laravel\PricingPlans\Models\Plan $plan
-     * @return \Laravel\PricingPlans\SubscriptionBuilder
+     * @param Plan $plan
+     * @return SubscriptionBuilder
      */
     public function newSubscription(string $subscription, Plan $plan)
     {
@@ -85,7 +88,7 @@ trait Subscribable
      * Get subscription usage manager instance.
      *
      * @param  string $subscription Subscription name
-     * @return \Laravel\PricingPlans\SubscriptionUsageManager
+     * @return SubscriptionUsageManager
      */
     public function subscriptionUsage(string $subscription)
     {

@@ -5,20 +5,21 @@ namespace Laravel\PricingPlans;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\PricingPlans\Models\Plan;
+use Laravel\PricingPlans\Models\PlanSubscription;
 
 class SubscriptionBuilder
 {
     /**
      * The subscriber model that is subscribing.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var Model
      */
     protected $subscriber;
 
     /**
      * The plan model that the subscriber is subscribing to.
      *
-     * @var \Laravel\PricingPlans\Models\Plan
+     * @var Plan
      */
     protected $plan;
 
@@ -48,9 +49,9 @@ class SubscriptionBuilder
     /**
      * Create a new subscription builder instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model $subscriber
+     * @param Model $subscriber
      * @param  string $name  Subscription name
-     * @param  \Laravel\PricingPlans\Models\Plan $plan
+     * @param Plan $plan
      */
     public function __construct(Model $subscriber, string $name, Plan $plan)
     {
@@ -65,7 +66,7 @@ class SubscriptionBuilder
      * @param  int $trialDays
      * @return self
      */
-    public function trialDays(int $trialDays)
+    public function trialDays(int $trialDays): SubscriptionBuilder
     {
         $this->trialDays = $trialDays;
 
@@ -77,7 +78,7 @@ class SubscriptionBuilder
      *
      * @return self
      */
-    public function skipTrial()
+    public function skipTrial(): SubscriptionBuilder
     {
         $this->skipTrial = true;
 
@@ -88,9 +89,9 @@ class SubscriptionBuilder
      * Create a new subscription.
      *
      * @param  array  $attributes
-     * @return \Laravel\PricingPlans\Models\PlanSubscription
+     * @return PlanSubscription
      */
-    public function create(array $attributes = [])
+    public function create(array $attributes = []): PlanSubscription
     {
         $now = Carbon::now();
 

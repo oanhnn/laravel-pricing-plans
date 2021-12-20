@@ -4,20 +4,21 @@ namespace Laravel\PricingPlans;
 
 use Laravel\PricingPlans\Models\Feature;
 use Laravel\PricingPlans\Models\PlanSubscription;
+use Laravel\PricingPlans\Models\PlanSubscriptionUsage;
 
 class SubscriptionUsageManager
 {
     /**
      * Subscription model instance.
      *
-     * @var \Laravel\PricingPlans\Models\PlanSubscription
+     * @var PlanSubscription
      */
     protected $subscription;
 
     /**
      * Create new Subscription Usage Manager instance.
      *
-     * @param \Laravel\PricingPlans\Models\PlanSubscription $subscription
+     * @param PlanSubscription $subscription
      */
     public function __construct(PlanSubscription $subscription)
     {
@@ -32,7 +33,7 @@ class SubscriptionUsageManager
      * @param string $featureCode
      * @param int $uses
      * @param bool $incremental
-     * @return \Laravel\PricingPlans\Models\PlanSubscriptionUsage
+     * @return PlanSubscriptionUsage
      * @throws \Throwable
      */
     public function record(string $featureCode, $uses = 1, $incremental = true)
@@ -70,10 +71,10 @@ class SubscriptionUsageManager
      *
      * @param int $featureId
      * @param int $uses
-     * @return \Laravel\PricingPlans\Models\PlanSubscriptionUsage
+     * @return PlanSubscriptionUsage
      * @throws \Throwable
      */
-    public function reduce($featureId, $uses = 1)
+    public function reduce(int $featureId, $uses = 1): PlanSubscriptionUsage
     {
         return $this->record($featureId, -$uses);
     }
@@ -83,7 +84,7 @@ class SubscriptionUsageManager
      *
      * @return self
      */
-    public function clear()
+    public function clear(): SubscriptionUsageManager
     {
         $this->subscription->usage()->delete();
 

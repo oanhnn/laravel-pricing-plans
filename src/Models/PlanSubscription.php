@@ -3,12 +3,16 @@
 namespace Laravel\PricingPlans\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use InvalidArgumentException;
+use Laravel\PricingPlans\Events\SubscriptionCanceled;
+use Laravel\PricingPlans\Events\SubscriptionPlanChanged;
 use Laravel\PricingPlans\Events\SubscriptionRenewed;
 use Laravel\PricingPlans\Period;
 use Laravel\PricingPlans\SubscriptionAbility;
@@ -25,13 +29,13 @@ use LogicException;
  * @property int $plan_id
  * @property string $name
  * @property bool $canceled_immediately
- * @property \Carbon\Carbon $starts_at
- * @property \Carbon\Carbon $ends_at
- * @property \Carbon\Carbon $canceled_at
- * @property \Carbon\Carbon $trial_ends_at
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property-read \Laravel\PricingPlans\Models\Plan $plan
+ * @property Carbon $starts_at
+ * @property Carbon $ends_at
+ * @property Carbon $canceled_at
+ * @property Carbon $trial_ends_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property-read Plan $plan
  */
 class PlanSubscription extends Model
 {
@@ -123,7 +127,7 @@ class PlanSubscription extends Model
     /**
      * Get subscriber.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function subscriber()
     {
@@ -133,7 +137,7 @@ class PlanSubscription extends Model
     /**
      * Get subscription usage.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function usage()
     {
@@ -149,7 +153,7 @@ class PlanSubscription extends Model
      *
      * @return string
      */
-    public function getStatusAttribute()
+    public function getStatusAttribute(): string
     {
         if ($this->isActive()) {
             return self::STATUS_ACTIVE;
@@ -250,7 +254,7 @@ class PlanSubscription extends Model
     /**
      * Change subscription plan.
      *
-     * @param int|\Laravel\PricingPlans\Models\Plan $plan Plan Id or Plan Model Instance
+     * @param int|Plan $plan Plan Id or Plan Model Instance
      * @return PlanSubscription|false
      * @throws InvalidArgumentException
      */

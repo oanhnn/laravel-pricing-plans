@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\Config;
  * @property int $subscription_id
  * @property string $feature_code
  * @property int $used
- * @property \Carbon\Carbon $valid_until
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property Carbon $valid_until
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
 class PlanSubscriptionUsage extends Model
 {

@@ -32,14 +32,14 @@ class Period
     /**
      * Starting date of the period.
      *
-     * @var \Carbon\Carbon
+     * @var Carbon
      */
     protected $startAt;
 
     /**
      * Ending date of the period.
      *
-     * @var \Carbon\Carbon
+     * @var Carbon
      */
     protected $endAt;
 
@@ -93,9 +93,9 @@ class Period
     /**
      * Get start date.
      *
-     * @return \Carbon\Carbon
+     * @return Carbon
      */
-    public function getStartAt()
+    public function getStartAt(): Carbon
     {
         return $this->startAt;
     }
@@ -103,9 +103,9 @@ class Period
     /**
      * Get end date.
      *
-     * @return \Carbon\Carbon
+     * @return Carbon
      */
-    public function getEndAt()
+    public function getEndAt(): Carbon
     {
         return $this->endAt;
     }
@@ -115,7 +115,7 @@ class Period
      *
      * @return string
      */
-    public function getIntervalUnit()
+    public function getIntervalUnit(): string
     {
         return $this->intervalUnit;
     }
@@ -125,7 +125,7 @@ class Period
      *
      * @return int
      */
-    public function getIntervalCount()
+    public function getIntervalCount(): int
     {
         return $this->intervalCount;
     }
@@ -156,7 +156,7 @@ class Period
      *
      * @return array
      */
-    public static function getAllIntervals()
+    public static function getAllIntervals(): array
     {
         $intervals = [];
 
@@ -170,10 +170,10 @@ class Period
     /**
      * Check if a given interval is valid.
      *
-     * @param  string $intervalUnit
+     * @param string $intervalUnit
      * @return bool
      */
-    public static function isValidIntervalUnit($intervalUnit): bool
+    public static function isValidIntervalUnit(string $intervalUnit): bool
     {
         return array_key_exists($intervalUnit, self::$intervalMapping);
     }
